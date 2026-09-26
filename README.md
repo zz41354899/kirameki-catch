@@ -2,6 +2,14 @@
 
 Vue 3 + Vite + GSAP 的原創角色互動網站，以繁體中文為主。延續星乃モモ的粉色雙馬尾與奶油黃配色，使用信封、邀請卡、蝴蝶結、角色手帳和橫向動作卡，建立可點擊、可捲動的日系角色官網。
 
+## 課程教材與線上案例
+
+- [完整課程教材](./COURSE.md)：整合 Vue、GSAP、Codex、IA、Design System、Reference、Prompt 與實作練習。
+- [課程案例規劃](./COURSE-CASE-PLAN.md)：教師備課流程、學員產出與案例拆解。
+- [Codex 專案提示詞](./CODEX-PROMPT.md)：專案 Context、設計規則、動畫限制與驗證條件。
+- [線上成果](https://kirameki-catch.vercel.app/)：上課時先觀察完成畫面，再回到原始碼分析。
+- [GitHub 原始碼](https://github.com/zz41354899/kirameki-catch)：對照 Vue 元件、GSAP 動畫與設計紀錄。
+
 ## 本機啟動與建置
 
 ```sh

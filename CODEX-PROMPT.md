@@ -4,6 +4,15 @@
 
 請先理解現有專案，再開始修改。不要在沒有檢查既有元件、樣式、動畫與素材的情況下重做網站。
 
+## 課程與案例 Context
+
+這個專案也是「讓網頁動起來：Vue + GSAP × Codex 網頁特效入門」的完整課程案例。課程內容整理於 `COURSE.md`，教學流程規劃整理於 `COURSE-CASE-PLAN.md`。
+
+- 線上成果：[星乃モモ互動舞台](https://kirameki-catch.vercel.app/)
+- 原始碼：[GitHub — zz41354899/kirameki-catch](https://github.com/zz41354899/kirameki-catch)
+
+原始對話的核心原則是：先理解網站，再描述需求，最後使用 Codex、Vue 與 GSAP 實作。工作流程必須是 `Idea → Goal → Target User → IA → Design System → Plan → Code → Review`，不能從模糊 Prompt 直接跳到 Code。
+
 ## 專案目標
 
 製作一個以原創角色「星乃モモ」為主角、繁體中文為主要語言的日系互動網站。網站應透過清楚的資訊架構、統一的設計系統與有目的的動畫，讓使用者感受到可愛、活潑、具有舞台感的角色世界。
@@ -33,12 +42,14 @@
 
 ```text
 Home
-├── 心動邀請開場
-├── Hero／角色主視覺
-├── 角色手帳
-├── 心動舞台
-├── 可愛圖鑑
-└── Footer／再次互動入口
+├── Opening Screen／愛心放大開場
+├── Site Header／品牌與選單
+├── Hero／今天，也要被可愛接住。
+├── Story／PROFILE、CHARM、DREAM
+├── Dance Invite／舞蹈與遊戲邀請
+├── Rhythm Game Modal／A、S、D、F 節奏遊戲
+├── Heart Card Modal／完成後取得心動小卡
+└── Site Footer／導覽與收尾文案
 ```
 
 元件應維持清楚責任，例如：
@@ -46,19 +57,24 @@ Home
 ```text
 src/
 ├── components/
-│   ├── OpeningInvite.vue
+│   ├── OpeningScreen.vue
+│   ├── SiteHeader.vue
+│   ├── PageProgressRail.vue
+│   ├── PointerEffects.vue
 │   ├── HeroSection.vue
 │   ├── StorySection.vue
-│   ├── DanceStage.vue
-│   ├── MomoSprite.vue
+│   ├── DanceInvite.vue
+│   ├── RhythmGameModal.vue
+│   ├── HeartCardModal.vue
 │   └── SiteFooter.vue
 ├── composables/
-│   ├── useWorldMotion.js
+│   ├── usePageExperience.js
+│   ├── useMomoMotion.js
 │   ├── useStageMotion.js
+│   ├── useModalFocus.js
 │   └── useSectionNavigation.js
 └── data/
-    ├── story.js
-    └── choreography.js
+    └── story.js
 ```
 
 不要只為了拆檔而拆檔；共用狀態、動畫生命週期與內容資料應放在合理位置，避免同一段邏輯散落在多個元件。
@@ -116,10 +132,10 @@ Hover／Press
 
 - Hero 標題、說明、CTA 與角色主視覺的分層進場。
 - 捲動時的淡入、位移、縮放與視差。
-- 角色姿勢與文字同步切換。
+- PROFILE、CHARM、DREAM 的文字與圖片同步切換。
 - 滑鼠或觸控操作後的即時視覺回饋。
-- 舞台區的固定捲動與時間線演出。
-- 開場信封、邀請卡、角色與紙幕的敘事式動畫。
+- 舞蹈邀請、節奏遊戲與心動小卡的狀態回饋。
+- 愛心放大開場與 Hero 銜接動畫。
 
 ### 動畫限制
 

@@ -8,7 +8,7 @@ import { scrollToSection } from '../composables/useSectionNavigation'
     <div class="hero-stage-ring" aria-hidden="true"></div>
     <div class="hero-copy">
       <p class="hero-kicker"><span>HOSHINO MOMO</span> 歡迎來到心動劇場</p>
-      <h1 id="hero-title" class="hero-title"><span class="hero-title-lead">今天，也要</span><span class="hero-title-main">被可愛</span><span class="hero-title-tail">接住。</span></h1>
+      <h1 id="hero-title" class="hero-title"><span class="hero-title-lead">今天的我</span><span class="hero-title-main">也很可愛。</span></h1>
       <p class="hero-intro">把你的小小心事交給モモ，<br>讓閃閃發亮的旋律，替今天綁上一個粉色蝴蝶結。</p>
     </div>
     <img class="hero-character" src="/images/momo-hero-reach.png" alt="向你伸出手的星乃モモ" />

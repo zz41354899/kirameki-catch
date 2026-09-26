@@ -29,7 +29,6 @@ watch(menuOpen, async (open) => {
 <template>
   <header class="site-header">
     <button class="brand" type="button" @click="scrollToSection('top')"><img src="/favicon.svg" alt="" /><span>星乃モモ<small>OFFICIAL SITE</small></span></button>
-    <span class="header-caption">把今天，變得更可愛一點。</span>
     <button class="menu-button" :aria-expanded="menuOpen" :aria-label="menuOpen ? '關閉選單' : '開啟選單'" @click="menuOpen = !menuOpen">
       <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="menu-label">{{ menuOpen ? '關閉' : '選單' }}</span>

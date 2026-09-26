@@ -64,9 +64,9 @@ function selectStory(index) {
   })
 }
 
-watch([menuOpen, gameModalOpen, cardModalOpen], ([menu, game, card]) => {
-  document.body.style.overflow = menu || game || card ? 'hidden' : ''
-})
+watch([introVisible, menuOpen, gameModalOpen, cardModalOpen], ([intro, menu, game, card]) => {
+  document.body.style.overflow = intro || menu || game || card ? 'hidden' : ''
+}, { immediate: true })
 
 onMounted(() => {
   removeLocationHash()

@@ -38,16 +38,23 @@ const {
           <span>SCORE <b>{{ String(gameScore).padStart(4, '0') }}</b></span>
         </div>
         <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleSound">♫&nbsp; BGM {{ soundOn ? 'ON' : 'OFF' }}</button>
-        <button class="rhythm-close" aria-label="關閉舞蹈遊戲" @click="close">關閉&nbsp; ×</button>
+        <div class="rhythm-window-actions">
+          <button v-if="gameActive" class="mobile-pause-toggle" :class="{ active: gamePaused }" :aria-label="gamePaused ? '繼續節奏遊戲' : '暫停節奏遊戲'" :aria-pressed="gamePaused" @click="togglePause">
+            <span aria-hidden="true">{{ gamePaused ? '▶' : 'Ⅱ' }}</span><b>{{ gamePaused ? '繼續' : '暫停' }}</b>
+          </button>
+          <button class="rhythm-close" aria-label="關閉舞蹈遊戲" @click="close">
+            <span class="rhythm-close-label">關閉</span><span class="rhythm-close-icon" aria-hidden="true">×</span>
+          </button>
+        </div>
       </header>
 
       <div class="game-shell" :class="{ playing: gameActive, paused: gamePaused, crying: isCrying }" :data-status="gameStatus" :data-difficulty="currentLevel.id">
         <div class="rhythm-stage-bg" aria-hidden="true"></div>
         <div class="velocity-field" aria-hidden="true"><i v-for="n in 8" :key="n"></i></div>
+        <div class="combo-readout"><b>{{ gameCombo }}</b><span>COMBO</span></div>
         <aside class="performer-zone">
-          <div class="combo-readout"><b>{{ gameCombo }}</b><span>COMBO</span></div>
           <Transition name="momo-miss" mode="out-in">
-            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" src="/images/momo-crying.png" alt="沒有接到節拍而掉眼淚的星乃モモ" />
+            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" src="/images/momo-crying-v2.png" alt="沒有接到節拍而掉眼淚的星乃モモ" />
             <MomoSprite v-else key="dancing" class="game-dancer" :frame="danceFrame" label="跟著節拍跳舞的星乃モモ" />
           </Transition>
           <div class="momo-stage-sign" aria-hidden="true"><b>Momo</b><span>一起跳動吧 ♡</span></div>
@@ -74,8 +81,10 @@ const {
             </button>
           </div>
           <div v-if="gamePaused" class="pause-panel" role="status">
-            <span>INTERMISSION</span><h3>先喘口氣。</h3><p>節拍已停在原地，準備好再繼續。</p>
-            <div><button @click="togglePause">繼續遊戲</button><button @click="startGame">重新開始</button></div>
+            <div class="pause-sheet">
+              <span>INTERMISSION</span><h3>先喘口氣。</h3><p>節拍已停在原地，準備好再繼續。</p>
+              <div><button @click="togglePause">▶&nbsp; 繼續遊戲</button><button @click="startGame">↻&nbsp; 重新開始</button></div>
+            </div>
           </div>
         </section>
 

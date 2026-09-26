@@ -24,7 +24,14 @@ GSAP 動畫規劃
 RWD、無障礙與驗證
 ```
 
-貫穿課程的實作案例是「心動宣言！— 星乃モモ的心動小宇宙」：一個使用 Vue 3、Vite 與 GSAP 製作的原創角色互動網站。
+貫穿課程的實作案例是「星乃モモ互動舞台」：一個使用 Vue 3、Vite 與 GSAP 製作的原創角色互動網站。
+
+## 案例網址
+
+- 線上成果：[星乃モモ互動舞台](https://kirameki-catch.vercel.app/)
+- 完整原始碼：[GitHub — zz41354899/kirameki-catch](https://github.com/zz41354899/kirameki-catch)
+
+課堂先看線上成果，再進入 GitHub 對照原始碼。這個順序先訓練觀察和描述，避免學員一開始就被程式碼牽著走。
 
 這個案例適合教學，因為它同時包含：
 
@@ -48,13 +55,9 @@ RWD、無障礙與驗證
 8. 知道哪些內容可以改、哪些內容應保留。
 9. 檢查 RWD、鍵盤操作、減少動態模式與 Console 錯誤。
 
-## Reference 網址
+## Reference 與案例網址
 
-課堂主要分析網址：
-
-```text
-待補：使用者提供的網站網址
-```
+Vercel 網址是案例成果，GitHub 網址是實作證據。Survedaa、CodeTV GSAP 等外部網站才是設計 Reference。課堂應清楚區分三種用途。
 
 網址加入後，課堂只分析下列面向：
 
@@ -84,7 +87,7 @@ RWD、無障礙與驗證
 | 原本教學主題 | 在星乃モモ案例中的用途 | 學員產出 |
 | --- | --- | --- |
 | Frontend／Backend | 判斷角色切換、動畫與字幕是否需要後端 | 功能分類表 |
-| IA | 整理首頁、角色手帳、舞台與圖鑑 | 網站樹狀圖 |
+| IA | 整理開場、Hero、Story、遊戲與心動小卡 | 網站樹狀圖 |
 | Design System | 定義奶油白、粉紅、莓果紅、字體、間距與動畫節奏 | Design tokens |
 | Reference | 分析提供的網址與其他互動網站 | Reference observation |
 | Prompt 與 Context | 把設計規則和修改限制交代給 Codex | 第一版專案 Prompt |
@@ -125,24 +128,27 @@ RWD、無障礙與驗證
 
 ```text
 Home
-├── Opening Invite／心動邀請開場
-├── Hero／角色主視覺
-├── Character Story／角色手帳
-├── Dance Stage／心動舞台
-├── Pose Gallery／可愛圖鑑
-└── Footer／再次互動入口
+├── Opening Screen／愛心放大開場
+├── Site Header／品牌與選單
+├── Hero／今天，也要被可愛接住。
+├── Story／PROFILE、CHARM、DREAM
+├── Dance Invite／舞蹈與遊戲邀請
+├── Rhythm Game Modal／A、S、D、F 節奏遊戲
+├── Heart Card Modal／心動小卡
+└── Footer／導覽與收尾文案
 ```
 
 ### 每個區域的責任
 
 | 區域 | 主要內容 | 主要互動 | 教學重點 |
 | --- | --- | --- | --- |
-| Opening | 信封、邀請卡、角色與標題 | 跳過、Esc、重播 | GSAP Timeline、焦點管理 |
-| Hero | 角色主視覺、標題、CTA | 點擊文字與角色 | Entrance、stagger、pointer feedback |
-| Character | 角色設定與日常故事 | 切換主題與姿勢 | Vue state、資料驅動畫面 |
-| Stage | 八個姿勢、文字與字幕 | 播放、暫停、換幀、拖曳 | Timeline、ScrollTrigger、同步狀態 |
-| Gallery | 八張動作卡 | 瀏覽、選擇、下載 | 橫向版面、鍵盤操作 |
-| Footer | 回到頁首與重播入口 | 導覽與重播 | 收尾節奏、可重入動畫 |
+| Opening | 愛心放大與品牌開場 | 自動完成、reduced motion | GSAP Timeline、背景鎖定 |
+| Hero | 角色主視覺、標題與說明 | Pointer、捲動 | Entrance、stagger、pointer feedback |
+| Story | PROFILE、CHARM、DREAM | 捲動或直接選擇 | Vue state、ScrollTrigger、同步內容 |
+| Dance Invite | 遊戲邀請與角色舞台 | 開始遊戲、打開小卡 | CTA 動態、狀態門檻 |
+| Rhythm Game | A、S、D、F 節奏操作 | 鍵盤、滑鼠、觸控 | 遊戲狀態、計分、焦點管理 |
+| Heart Card | 完成遊戲後的回饋 | 關閉、再次遊玩 | Modal、解鎖流程 |
+| Footer | 回到首頁、角色介紹或遊戲 | 區段導覽 | 收尾節奏、導覽一致性 |
 
 ## Design System
 
@@ -392,15 +398,15 @@ git diff --check
 
 這樣學員會看見 Prompt 是如何隨著理解增加而變完整，而不是把「很長的 Prompt」誤認為唯一解法。
 
-## 網址補入後的下一步
+## 網址搭配方式
 
-收到網址後，補完以下內容：
+1. 開啟 Vercel 成果，請學員只用畫面描述網站。
+2. 請學員畫出 IA，指出每段動畫的觸發與目的。
+3. 打開 GitHub，比較推測的元件結構和實際原始碼。
+4. 從 `CODEX-PROMPT.md` 取出單一需求，請 Codex 修改一個效果。
+5. 完成本機測試與 build，再比較本機結果和既有 Vercel 版本。
 
-1. Reference 網站的畫面與互動觀察。
-2. 適合本案例的三到五項設計原則。
-3. 一個可以在課堂完成的動畫拆解。
-4. 一個進階示範，但不要求所有學員完成的效果。
-5. 把分析結果轉換成可直接交給 Codex 的實作 Prompt。
+本機修改不代表公開網址已更新。課堂回報需要區分本機、GitHub 與 Vercel 狀態。
 
 最終課程主軸應保持為：
 

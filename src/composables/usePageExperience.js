@@ -74,7 +74,13 @@ export function usePageExperience(root, activeStory, storyCount) {
   }
 
   onMounted(() => {
-    introTimer = window.setTimeout(dismissIntro, prefersReducedMotion() ? 50 : 1450)
+    const heart = root.value?.querySelector('.intro-heart')
+    const heartBounds = heart?.getBoundingClientRect()
+    const heartCoverScale = heartBounds?.width && heartBounds?.height
+      ? Math.max(28, Math.max(window.innerWidth / heartBounds.width, window.innerHeight / heartBounds.height) * 4.2)
+      : 40
+
+    introTimer = window.setTimeout(dismissIntro, prefersReducedMotion() ? 50 : 1650)
     context = gsap.context(() => {
       if (!prefersReducedMotion()) {
         gsap.timeline()
@@ -86,7 +92,8 @@ export function usePageExperience(root, activeStory, storyCount) {
           })
           .to('.intro-heart', { scale: 1.08, duration: 0.16, ease: 'sine.out' })
           .to('.intro-heart', { scale: 1, duration: 0.18, ease: 'sine.inOut' })
-          .to('.intro-heart', { scale: 22, duration: 0.65, ease: 'power2.inOut' })
+          .to('.intro-heart', { scale: heartCoverScale, duration: 0.7, ease: 'power2.inOut' })
+          .to('.intro-heart', { scale: heartCoverScale * 1.08, duration: 0.14, ease: 'none' })
         gsap.timeline({ delay: 1.15, defaults: { ease: 'power3.out' } })
           .from('.site-header', { y: -25, opacity: 0, duration: 0.55 })
           .from('.hero-kicker, .hero-title span', { y: 70, opacity: 0, stagger: 0.08, duration: 0.75 }, '-=.15')
