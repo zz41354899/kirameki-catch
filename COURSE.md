@@ -15,6 +15,8 @@ meta:
 
 - [瀏覽星乃モモ互動舞台](https://kirameki-catch.vercel.app/)
 - [查看 kirameki-catch 原始碼](https://github.com/zz41354899/kirameki-catch)
+- [查看 Codex 專案提示詞](https://github.com/zz41354899/kirameki-catch/blob/main/CODEX-PROMPT.md)
+- [查看課程案例規劃](https://github.com/zz41354899/kirameki-catch/blob/main/COURSE-CASE-PLAN.md)
 
 上課時先瀏覽線上成果，不要先看原始碼。請先用自己的語言描述畫面與動畫，再打開 GitHub 對照 Vue 元件和 GSAP 實作。
 

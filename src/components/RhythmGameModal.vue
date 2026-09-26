@@ -37,7 +37,9 @@ const {
           <span>STAGE <b>{{ currentLevel.id }}/{{ rhythmLevels.length }}</b></span>
           <span>SCORE <b>{{ String(gameScore).padStart(4, '0') }}</b></span>
         </div>
-        <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleSound">♫&nbsp; BGM {{ soundOn ? 'ON' : 'OFF' }}</button>
+        <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleSound">
+          <span>BGM</span><b>{{ soundOn ? 'ON' : 'OFF' }}</b>
+        </button>
         <div class="rhythm-window-actions">
           <button v-if="gameActive" class="mobile-pause-toggle" :class="{ active: gamePaused }" :aria-label="gamePaused ? '繼續節奏遊戲' : '暫停節奏遊戲'" :aria-pressed="gamePaused" @click="togglePause">
             <span aria-hidden="true">{{ gamePaused ? '▶' : 'Ⅱ' }}</span><b>{{ gamePaused ? '繼續' : '暫停' }}</b>
@@ -82,8 +84,20 @@ const {
           </div>
           <div v-if="gamePaused" class="pause-panel" role="status">
             <div class="pause-sheet">
+              <div class="pause-stage-card" aria-label="目前關卡與難度">
+                <div class="pause-stage-heading">
+                  <span>STAGE 0{{ currentLevel.id }} / 0{{ rhythmLevels.length }}</span><em>自動進階</em>
+                </div>
+                <strong>{{ currentLevel.name }}</strong>
+                <small>{{ currentLevel.englishName }} · {{ currentLevel.speedLabel }} · {{ currentLevel.density }}</small>
+                <div class="pause-stage-meter" aria-hidden="true">
+                  <i v-for="(level, index) in rhythmLevels" :key="level.id" :class="{ active: index === currentLevelIndex, complete: index < currentLevelIndex }">
+                    <b>0{{ level.id }}</b><span>{{ level.name }}</span>
+                  </i>
+                </div>
+              </div>
               <span>INTERMISSION</span><h3>先喘口氣。</h3><p>節拍已停在原地，準備好再繼續。</p>
-              <div><button @click="togglePause">▶&nbsp; 繼續遊戲</button><button @click="startGame">↻&nbsp; 重新開始</button></div>
+              <div class="pause-actions"><button @click="togglePause">▶&nbsp; 繼續遊戲</button><button @click="startGame">↻&nbsp; 重新開始</button></div>
             </div>
           </div>
         </section>
