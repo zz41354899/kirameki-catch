@@ -1,0 +1,22 @@
+/* Stage-only additions: preserve the original character, palette and controls. */
+.performance .performance-top h2{font-family:inherit;letter-spacing:.06em;font-size:12px}
+.performance .performance-top h2 small{font:700 8px 'DM Sans',sans-serif;letter-spacing:1.5px;margin-left:5px;opacity:.65}
+.performance .live-caption>span{font-family:inherit;font-size:10px;letter-spacing:.08em;border-radius:20px;padding:7px 12px}
+.performance .stage-shout{white-space:nowrap;font-size:clamp(29px,4.15vw,64px);margin:13px 0 6px;line-height:1.2;letter-spacing:-.045em}
+.shout-character{display:inline-block;transform-origin:50% 80%}
+.stage-japanese{display:block;font-weight:800;font-size:13px;letter-spacing:.12em;color:var(--ink)}
+.performance .stage-heart-button{font-family:inherit;cursor:pointer;z-index:4;transition:background .2s,box-shadow .2s}
+.stage-heart-button:hover{background:var(--ink);box-shadow:4px 4px 0 var(--pink)}
+.stage-heart-button:focus-visible{outline:3px solid var(--ink);outline-offset:5px}
+.stage-heart-button small{margin-top:3px;letter-spacing:.03em}
+.stage-heart-button>span{font-size:25px;line-height:1.05}
+.performance .scene-corner{line-height:1.9}
+@media(max-width:760px){
+  .performance .performance-top h2{font-size:10px;letter-spacing:0;gap:6px}
+  .performance .performance-top h2 small{display:none}
+  .performance .live-caption>span{font-size:7px;letter-spacing:0;padding:5px 8px}
+  .performance .stage-shout{font-size:clamp(25px,7.4vw,40px);margin:10px 0 5px;letter-spacing:-.065em}
+  .stage-japanese{font-size:10px}
+  .stage-heart-button>span{font-size:19px}
+}
+@media(max-width:380px){.performance .stage-shout{font-size:26px}}
