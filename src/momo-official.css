@@ -430,8 +430,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 @media (max-width: 560px) {
   .site-header { height: 66px; }
-  .brand span { font-size: 7px; }
-  .brand small { display: none; }
+  .brand span { font-size: 11px; }
+  .brand small { display: block; font-size: 6px; }
   .brand img { width: 24px; height: 24px; }
   .menu-overlay { display: block; padding-top: 66px; overflow-y: auto; }
   .menu-visual { height: 38svh; }
@@ -445,14 +445,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .hero-section { min-height: 820px; }
   .hero-giant { top: 19%; right: -24%; font-size: 92vw; }
   .hero-copy { top: 11%; left: 7%; right: 7%; }
-  .hero-kicker { gap: 8px; margin-bottom: 20px; font-size: 6.5px; white-space: nowrap; }
-  .hero-kicker span { padding: 5px 7px; font-size: 5.5px; }
+  .hero-kicker { gap: 8px; margin-bottom: 20px; font-size: 10px; white-space: nowrap; }
+  .hero-kicker span { padding: 6px 8px; font-size: 8px; }
   .hero-title { font-size: clamp(60px, 14.2vw, 76px); line-height: .9; }
   .hero-title .hero-title-lead { margin-bottom: .4em; font-size: .5em; }
   .hero-title .hero-title-tail { margin-top: .2em; margin-left: .5em; }
   .hero-character { left: -24%; bottom: -3%; width: 108vw; height: 64%; }
   .hero-character-art { object-position: left bottom; }
-  .hero-reaction { top: 7%; left: 63%; max-width: 126px; padding: 6px 8px; font-size: 8px; }
+  .hero-intro { max-width: 295px; font-size: 12px; line-height: 2; }
+  .hero-reaction { top: 7%; right: 5%; left: auto; width: min(160px, 44vw); max-width: none; padding: 9px 11px; font-size: 11px; line-height: 1.55; }
   .hero-stage-ring { left: -45%; bottom: -7%; width: 130vw; }
   .hero-scroll-cue { right: 6%; bottom: 5%; }
   .hero-scroll-cue span { display: none; }
@@ -886,7 +887,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .lunar-pop .hero-copy { top: 12%; left: 7%; right: 7%; }
   .lunar-pop .hero-title { font-size: clamp(58px, 15vw, 76px); }
   .lunar-pop .hero-title .hero-title-lead { font-size: .35em; }
-  .lunar-pop .hero-intro { display: block; max-width: 275px; margin-top: 24px; font-size: 11px; }
+  .lunar-pop .hero-intro { display: block; max-width: 295px; margin-top: 24px; font-size: 12px; line-height: 2; }
   .lunar-pop .hero-intro::before { display: none; }
   .lunar-pop .hero-character { left: -18%; bottom: -2%; width: 118vw; height: 66%; }
   .hero-rabbit-mark--left { top: 48%; left: 8%; }
@@ -896,6 +897,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .lunar-pop .cta-visual { min-height: 450px; }
   .lunar-pop .cta-visual img { left: -14%; bottom: -14%; width: 125%; height: 120%; }
   .lunar-pop .cta-copy { padding: 46px 25px 54px; }
-  .intro-rabbit-head { width: clamp(188px, 58vw, 274px); }
-  .intro-loading { top: calc(46% + 150px); width: min(248px, 60vw); }
+  /* The source frame has generous transparent padding; size this by the visible rabbit on phones. */
+  .intro-rabbit-head { width: clamp(270px, 82vw, 330px); }
+  .intro-loading { top: calc(46% + min(184px, calc(41vw + 36px))); width: min(248px, 68vw); }
 }
