@@ -111,6 +111,10 @@ function chooseReaction(name) {
   resetReactionTimer = window.setTimeout(restoreDefault, 2000)
 }
 
+function releasePointerFocus(event) {
+  requestAnimationFrame(() => event.currentTarget?.blur())
+}
+
 onBeforeUnmount(() => {
   window.clearTimeout(resetReactionTimer)
   reactionTimeline?.kill()
@@ -138,15 +142,17 @@ onBeforeUnmount(() => {
       <h1 id="hero-title" class="hero-title"><span class="hero-title-lead">今晚，陪伴著你</span><span class="hero-title-main">月亮偶像</span></h1>
       <p class="hero-intro">戴上兔耳，跟著節拍跳進月亮裡。<br>モモ會把每一次心跳，都變成今夜的光。</p>
     </div>
-    <div class="hero-character" :class="`hero-character--${activeReaction}`" role="group" aria-label="可互動的月兔モモ">
-      <img ref="baseArt" class="hero-character-art" src="/images/momo-moon-rabbit-hero-v2.webp" :alt="activeReaction === 'default' ? reaction.alt : ''" fetchpriority="high" />
-      <img v-if="activeReaction !== 'default'" ref="reactionArt" :key="`${activeReaction}-${reactionToken}`" class="hero-character-reaction" :src="reaction.image" :alt="reaction.alt" @load="playReactionMotion" />
-      <button class="hero-hotspot hero-hotspot--head" type="button" aria-label="摸摸モモ的頭，看看她高興的反應" @click.stop="chooseReaction('happy')" />
-      <button class="hero-hotspot hero-hotspot--middle" type="button" aria-label="點擊モモ的中間，看看她生氣的反應" @click.stop="chooseReaction('angry')" />
-      <button class="hero-hotspot hero-hotspot--thigh" type="button" aria-label="點擊モモ的大腿，看看她嚇到的反應" @click.stop="chooseReaction('startled')" />
-      <button class="hero-hotspot hero-hotspot--feet" type="button" aria-label="點擊モモ的腳，看看她疑惑的反應" @click.stop="chooseReaction('confused')" />
-      <div v-if="activeReaction !== 'default'" :key="`${activeReaction}-sparkles`" class="hero-reaction-sparkles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></div>
-      <p :key="activeReaction" class="hero-reaction" aria-live="polite">{{ reaction.message }}</p>
+    <div class="hero-character-stage">
+      <div class="hero-character" :class="`hero-character--${activeReaction}`" role="group" aria-label="可互動的月兔モモ">
+        <img ref="baseArt" class="hero-character-art" src="/images/momo-moon-rabbit-hero-v2.webp" :alt="activeReaction === 'default' ? reaction.alt : ''" fetchpriority="high" draggable="false" />
+        <img v-if="activeReaction !== 'default'" ref="reactionArt" :key="`${activeReaction}-${reactionToken}`" class="hero-character-reaction" :src="reaction.image" :alt="reaction.alt" draggable="false" @load="playReactionMotion" />
+        <button class="hero-hotspot hero-hotspot--head" type="button" aria-label="摸摸モモ的頭，看看她高興的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('happy')" />
+        <button class="hero-hotspot hero-hotspot--middle" type="button" aria-label="點擊モモ的中間，看看她生氣的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('angry')" />
+        <button class="hero-hotspot hero-hotspot--thigh" type="button" aria-label="點擊モモ的大腿，看看她嚇到的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('startled')" />
+        <button class="hero-hotspot hero-hotspot--feet" type="button" aria-label="點擊モモ的腳，看看她疑惑的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('confused')" />
+        <div v-if="activeReaction !== 'default'" :key="`${activeReaction}-sparkles`" class="hero-reaction-sparkles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></div>
+        <p :key="activeReaction" class="hero-reaction" aria-live="polite">{{ reaction.message }}</p>
+      </div>
     </div>
     <button class="hero-scroll-cue" type="button" @click="scrollToSection('story')"><span>ENTER THE STAGE</span><b>↓</b></button>
   </section>

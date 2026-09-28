@@ -1,5 +1,6 @@
 <script setup>
-import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from '#imports'
 import DanceInvite from './components/DanceInvite.vue'
 import HeroSection from './components/HeroSection.vue'
 import OpeningScreen from './components/OpeningScreen.vue'
@@ -9,59 +10,41 @@ import SiteFooter from './components/SiteFooter.vue'
 import SiteHeader from './components/SiteHeader.vue'
 import StorySection from './components/StorySection.vue'
 import { usePageExperience } from './composables/usePageExperience'
+import { useWardrobe } from './composables/useWardrobe'
 import { removeLocationHash, scrollToSection } from './composables/useSectionNavigation'
 import { storySteps } from './data/story'
-
-const loadGameModal = () => import('./components/RhythmGameModal.vue')
-const loadCardModal = () => import('./components/HeartCardModal.vue')
-const RhythmGameModal = defineAsyncComponent(loadGameModal)
-const HeartCardModal = defineAsyncComponent(loadCardModal)
 
 const root = ref(null)
 const activeStory = ref(0)
 const menuOpen = ref(false)
-const gameModalOpen = ref(false)
-const cardModalOpen = ref(false)
-const cardUnlocked = ref(false)
-const gameScore = ref(0)
-let gamePrefetchObserver
+const router = useRouter()
+const route = useRoute()
+const skipOpeningOnReturn = route.query.skipOpening === '1'
+const { gameCompleted } = useWardrobe()
 const {
-  introVisible, introLoadingComplete, introLoadingProgress, scrollProgress, activeSectionLabel, cursorVisible, cursorHearts,
+  introVisible, introLoadingComplete, introLoadingProgress, introFrame, entryFlash, scrollProgress, activeSectionLabel, cursorVisible, cursorHearts,
   onPointerMove, spawnCursorHeart,
-} = usePageExperience(root, activeStory, storySteps.length)
+} = usePageExperience(root, activeStory, storySteps.length, { skipOpening: skipOpeningOnReturn })
 
 function openGame() {
-  void loadCardModal()
-  cardModalOpen.value = false
-  cardUnlocked.value = false
-  gameModalOpen.value = true
+  router.push('/game')
 }
 
 function openCard() {
-  if (!cardUnlocked.value) {
+  if (!gameCompleted.value) {
     document.querySelector('#dance')?.scrollIntoView({ behavior: 'smooth' })
     return
   }
-  gameModalOpen.value = false
-  cardModalOpen.value = true
-}
-
-function completeGame({ score }) {
-  gameScore.value = score
-  cardUnlocked.value = true
-  gameModalOpen.value = false
-  cardModalOpen.value = true
+  router.push('/gallery')
 }
 
 function selectStory(index) {
-  activeStory.value = index
-
   const section = document.querySelector('.story-section')
   if (!section) return
 
   const sectionTop = window.scrollY + section.getBoundingClientRect().top
   const scrollDistance = Math.max(0, section.offsetHeight - window.innerHeight)
-  const progress = (index + 0.5) / storySteps.length
+  const progress = storySteps.length > 1 ? index / (storySteps.length - 1) : 0
 
   window.scrollTo({
     top: sectionTop + scrollDistance * progress,
@@ -74,25 +57,17 @@ function setMenuOpen(open) {
   if (open) cursorVisible.value = false
 }
 
-watch([introVisible, menuOpen, gameModalOpen, cardModalOpen], ([intro, menu, game, card]) => {
-  document.body.style.overflow = intro || menu || game || card ? 'hidden' : ''
+watch(menuOpen, (menu) => {
+  if (typeof document === 'undefined') return
+  document.body.style.overflow = menu ? 'hidden' : ''
 }, { immediate: true })
 
 onMounted(() => {
+  if (skipOpeningOnReturn) router.replace('/')
   removeLocationHash()
-  if ('IntersectionObserver' in window) {
-    gamePrefetchObserver = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) return
-      void loadGameModal()
-      gamePrefetchObserver.disconnect()
-    }, { rootMargin: '200px' })
-    const danceSection = root.value?.querySelector('.dance-section')
-    if (danceSection) gamePrefetchObserver.observe(danceSection)
-  }
 })
 
 onBeforeUnmount(() => {
-  gamePrefetchObserver?.disconnect()
   document.body.style.overflow = ''
 })
 </script>
@@ -100,8 +75,9 @@ onBeforeUnmount(() => {
 <template>
   <div ref="root" class="momo-site lunar-pop" @pointermove="!menuOpen && onPointerMove($event)" @click="!menuOpen && spawnCursorHeart($event)" @pointerleave="cursorVisible = false">
     <button class="skip-link" type="button" @click="scrollToSection('main', { focus: true })">跳至主要內容</button>
-    <OpeningScreen :visible="introVisible" :complete="introLoadingComplete" :progress="introLoadingProgress" />
-    <div class="site-shell" :class="{ 'is-intro-active': introVisible }">
+    <OpeningScreen :visible="introVisible" :complete="introLoadingComplete" :progress="introLoadingProgress" :frame="introFrame" />
+    <div v-if="entryFlash" class="entry-flash" aria-hidden="true" @animationend="entryFlash = false"></div>
+    <div class="site-shell">
       <PointerEffects :visible="cursorVisible && !menuOpen" :hearts="cursorHearts" />
       <PageProgressRail :progress="scrollProgress" :label="activeSectionLabel" />
       <SiteHeader @overlay-change="setMenuOpen" />
@@ -109,11 +85,9 @@ onBeforeUnmount(() => {
       <main id="main">
         <HeroSection />
         <StorySection :active-story="activeStory" :stories="storySteps" @select="selectStory" />
-        <DanceInvite :card-unlocked="cardUnlocked" @play="openGame" @open-card="openCard" />
+        <DanceInvite :card-unlocked="gameCompleted" :on-play="openGame" :on-open-card="openCard" />
       </main>
 
-      <RhythmGameModal v-if="gameModalOpen" @close="gameModalOpen = false" @complete="completeGame" />
-      <HeartCardModal v-if="cardModalOpen" :score="gameScore" @close="cardModalOpen = false" />
       <SiteFooter />
     </div>
   </div>

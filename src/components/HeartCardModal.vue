@@ -1,12 +1,16 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { isWardrobeCardUnlocked, wardrobeCardRequiredIds } from '../data/wardrobe'
 import { useModalFocus } from '../composables/useModalFocus'
 
-const props = defineProps({ score: { type: Number, default: 0 } })
+const props = defineProps({
+  unlockedIds: { type: Array, default: () => [] },
+})
 const emit = defineEmits(['close'])
 const modal = ref(null)
 const close = () => emit('close')
 useModalFocus(modal, close)
+
 const cardMessage = ref('月圓時，\n把想念寄給\n最可愛的你。')
 const cardTone = ref('moonlight')
 const cardOrientation = ref('portrait')
@@ -25,7 +29,14 @@ const cardGallery = [
   { id: 'lantern-dance', title: '花燈共舞', note: '今夜的月光，和モモ一起跳。', image: '/images/momo-moon-rabbit-lantern-dance-v1.webp', tone: 'night', orientation: 'portrait', layout: 'idol', message: '花燈搖曳，\n和偶像モモ\n一起跳進月光。' },
   { id: 'osmanthus-pavilion', title: '桂月水榭', note: '月色與桂香都剛剛好。', image: '/images/momo-moon-rabbit-osmanthus-pavilion-v1.webp', tone: 'osmanthus', orientation: 'landscape', layout: 'scene', message: '桂月水榭，\n今晚慢慢喝一口\n月光。' },
   { id: 'lantern-river', title: '星燈月台', note: '把今夜跳成最亮的光。', image: '/images/momo-moon-rabbit-lantern-river-v1.webp', tone: 'night', orientation: 'landscape', layout: 'scene', message: '星燈月台，\n和偶像モモ一起\n舞進滿月。' },
+  { id: 'wardrobe-secret', title: '月光衣櫥', note: '換上喜歡的模樣，收藏衣櫥的祕密月光。', image: '/images/momo-moon-rabbit-wardrobe-card-v1.webp', tone: 'night', orientation: 'landscape', layout: 'scene', message: '換上喜歡的\n模樣，月光也\n會記得你。', requiresWardrobe: true },
 ]
+
+const wardrobeCardProgress = computed(() => wardrobeCardRequiredIds.filter((id) => props.unlockedIds.includes(id)).length)
+
+function isCardLocked(card) {
+  return card.requiresWardrobe && !isWardrobeCardUnlocked(props.unlockedIds)
+}
 
 function getCardLines(value, orientation) {
   const maxCharacters = orientation === 'landscape' ? 10 : 7
@@ -67,6 +78,7 @@ watch(cardOrientation, (orientation) => {
 })
 
 function chooseCard(card) {
+  if (isCardLocked(card)) return
   selectedPreset.value = card.id
   cardTone.value = card.tone
   cardOrientation.value = card.orientation
@@ -152,7 +164,7 @@ async function downloadCard() {
   <div ref="modal" class="experience-modal card-modal" role="dialog" aria-modal="true" aria-labelledby="card-title">
     <div class="modal-panel card-dialog">
       <button class="modal-close" aria-label="關閉客製小卡" @click="close">×</button>
-      <div class="card-intro"><p>MOMO MID-AUTUMN CARD BOOK</p><h2 id="card-title">把月光，收進<br><em>你的中秋圖鑑。</em></h2><span>挑一張月兔モモ的祝福，寫成只屬於你的中秋收藏。</span></div>
+      <div class="card-intro"><p>MOMO MOON CARD STUDIO</p><h2 id="card-title">把月光，收進<br><em>你的專屬圖鑑。</em></h2><span>挑選一張月兔小卡，寫下今晚的心意，再收藏成屬於你的畫面。</span></div>
       <div class="card-workbench">
         <div class="card-preview" :class="[cardTone, cardOrientation, { 'has-three-lines': cardTextLines.length === 3, 'scene-card': cardLayout === 'scene' }]">
           <div class="card-meta"><img src="/images/lunar-pop-rabbit-mark-v1.webp" alt="" /><span>MOMO MOON CARD</span></div>
@@ -168,17 +180,19 @@ async function downloadCard() {
           <small id="card-copy-note" class="card-copy-note">已輸入 {{ cardTextCount }} / {{ cardTextCapacity }} 字，最多三行，會依卡面比例自動收好。</small>
           <fieldset v-if="cardLayout !== 'scene'"><legend>今晚想收下哪一種月色？</legend><button v-for="tone in [{ id: 'moonlight', label: '粉月微光' }, { id: 'osmanthus', label: '桂花暖金' }, { id: 'night', label: '紫夜星河' }]" :key="tone.id" :class="tone.id" :aria-pressed="cardTone === tone.id" @click="cardTone = tone.id">{{ tone.label }}</button></fieldset>
           <fieldset><legend>小卡比例</legend><button :aria-pressed="cardOrientation === 'portrait'" @click="cardOrientation = 'portrait'">直式</button><button :aria-pressed="cardOrientation === 'landscape'" @click="cardOrientation = 'landscape'">橫式</button></fieldset>
-          <button class="download-card" @click="downloadCard">收藏月光小卡 PNG</button>
+          <button class="download-card" @click="downloadCard">收藏月光小卡 WEBP</button>
           <p class="download-status" role="status">{{ downloadStatus }}</p>
         </div>
       </div>
       <section class="card-collection" aria-labelledby="collection-title">
         <div class="collection-heading"><p>MID-AUTUMN COLLECTION</p><h3 id="collection-title">月兔小卡圖鑑</h3><span>點選一張，換上今晚想收藏的月光。</span></div>
         <div class="collection-grid">
-          <button v-for="(card, index) in cardGallery" :key="card.id" class="collection-card" :class="[card.orientation, card.layout, { active: selectedPreset === card.id }]" :aria-pressed="selectedPreset === card.id" @click="chooseCard(card)">
-            <img :src="card.image" alt="" /><span><b>{{ card.title }}</b><small>{{ card.note }}</small></span>
+          <button v-for="(card, index) in cardGallery" :key="card.id" class="collection-card" :class="[card.orientation, card.layout, { active: selectedPreset === card.id, locked: isCardLocked(card) }]" :disabled="isCardLocked(card)" :aria-pressed="selectedPreset === card.id" :aria-label="isCardLocked(card) ? `第六章月光衣櫥尚未解鎖，衣櫥條件完成 ${wardrobeCardProgress} / 2` : `選擇${card.title}小卡`" @click="chooseCard(card)">
+            <img :src="card.image" alt="" />
+            <span class="collection-copy"><b>{{ card.title }}</b><small>{{ card.note }}</small></span>
+            <span v-if="isCardLocked(card)" class="collection-lock" aria-hidden="true"><strong>第六章・封存中</strong><small>衣櫥條件 {{ wardrobeCardProgress }} / 2</small><small>解鎖月牙側馬尾＋月光練習服</small></span>
             <em aria-hidden="true">0{{ index + 1 }}</em>
-            <i aria-hidden="true">{{ card.layout === 'scene' ? 'MOON STAGE' : 'MOON RABBIT' }}</i>
+            <i aria-hidden="true">{{ card.requiresWardrobe ? 'SECRET WARDROBE' : card.layout === 'scene' ? 'MOON STAGE' : 'MOON RABBIT' }}</i>
           </button>
         </div>
       </section>

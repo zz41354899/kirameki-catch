@@ -1,14 +1,42 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import MomoSprite from './MomoSprite.vue'
+import WardrobeModal from './WardrobeModal.vue'
+import { getSadFrameSource } from '../data/wardrobe'
 import { danceLanes, useRhythmGame } from '../composables/useRhythmGame'
 import { rhythmLevels } from '../rhythmGame'
 import { useModalFocus } from '../composables/useModalFocus'
 import { useSoundtrack } from '../composables/useSoundtrack'
 
-const emit = defineEmits(['close', 'complete'])
+const props = defineProps({
+  appearance: { type: Object, required: true },
+  unlockedIds: { type: Array, required: true },
+  standalone: Boolean,
+})
+const emit = defineEmits(['close', 'complete', 'select-hair', 'select-outfit'])
+const sadFrameSource = computed(() => getSadFrameSource(props.appearance.hairId, props.appearance.outfitId))
 const modal = ref(null)
+const fabOpen = ref(false)
+const wardrobeOpen = ref(false)
 const close = () => emit('close')
+function openWardrobe() {
+  fabOpen.value = false
+  if (gameActive.value && !gamePaused.value) togglePause()
+  wardrobeOpen.value = true
+}
+function closeWardrobe() { wardrobeOpen.value = false }
+function pauseFromFab() {
+  togglePause()
+  fabOpen.value = false
+}
+function endFromFab() {
+  fabOpen.value = false
+  endGameEarly()
+}
+function soundFromFab() {
+  toggleSound()
+  fabOpen.value = false
+}
 useModalFocus(modal, close)
 const { soundOn, synthTone, enableSound, toggleSound } = useSoundtrack()
 const {
@@ -16,10 +44,11 @@ const {
   notes, danceFrame, letterSending, currentLevel, currentLevelIndex,
   isCrying, missCount, startGame, endGameEarly, togglePause, hitLane,
 } = useRhythmGame({ enableSound, synthTone, onComplete: (result) => emit('complete', result) })
+
 </script>
 
 <template>
-  <div ref="modal" class="experience-modal game-modal" role="dialog" aria-modal="true" aria-labelledby="game-dialog-title">
+  <div ref="modal" class="experience-modal game-modal" :class="{ 'game-modal--route': standalone }" role="dialog" :aria-modal="!standalone" aria-labelledby="game-dialog-title">
     <div class="modal-panel game-dialog" :class="{ 'is-paused': gamePaused }">
       <header class="rhythm-hud">
         <div class="rhythm-brand">
@@ -37,6 +66,9 @@ const {
           <span>STAGE <b>{{ currentLevel.id }}/{{ rhythmLevels.length }}</b></span>
           <span>SCORE <b>{{ String(gameScore).padStart(4, '0') }}</b></span>
         </div>
+        <button class="game-wardrobe-toggle" aria-label="前往月光衣櫥" @click="openWardrobe">
+          <span aria-hidden="true">✦</span><b>前往衣櫥</b>
+        </button>
         <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleSound">
           <span>BGM</span><b>{{ soundOn ? 'ON' : 'OFF' }}</b>
         </button>
@@ -57,8 +89,8 @@ const {
         <div class="combo-readout"><b>{{ gameCombo }}</b><span>COMBO</span></div>
         <aside class="performer-zone">
           <Transition name="momo-miss" mode="out-in">
-            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" src="/images/momo-moon-rabbit-sad-v2.webp" alt="沒有接到節拍而難過的月兔モモ" />
-            <MomoSprite v-else key="dancing" class="game-dancer" :frame="danceFrame" label="跟著節拍跳舞的月兔モモ" />
+            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" :src="sadFrameSource" alt="沒有接到節拍而難過的月兔モモ" />
+            <MomoSprite v-else key="dancing" class="game-dancer" :hair-id="appearance.hairId" :outfit-id="appearance.outfitId" :frame="danceFrame" label="跟著節拍跳舞的月兔モモ" />
           </Transition>
           <div class="momo-stage-sign" aria-hidden="true"><b>Momo</b><span>一起跳進月光裡</span></div>
           <div v-if="gameActive" class="game-actions">
@@ -109,6 +141,23 @@ const {
           <img class="rabbit-character" src="/images/lunar-pop-rabbit-mark-v1.webp" alt="帶著月光祝福的月兔" />
         </div>
       </div>
+      <div class="game-fab" :class="{ 'is-open': fabOpen }" aria-label="遊戲快捷操作">
+        <div v-if="fabOpen" class="game-fab__actions">
+          <button v-if="gameActive" class="game-fab__action game-fab__action--pause" :aria-label="gamePaused ? '繼續節奏遊戲' : '暫停節奏遊戲'" @click="pauseFromFab"><span aria-hidden="true">{{ gamePaused ? '▶' : 'Ⅱ' }}</span></button>
+          <button class="game-fab__action game-fab__action--wardrobe" aria-label="前往月光衣櫥" @click="openWardrobe"><span aria-hidden="true">✦</span></button>
+          <button v-if="gameActive" class="game-fab__action game-fab__action--end" aria-label="提早結束本輪遊戲並前往月光小卡" @click="endFromFab"><span aria-hidden="true">■</span></button>
+          <button class="game-fab__action game-fab__action--sound" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="soundFromFab"><span aria-hidden="true">{{ soundOn ? '♫' : '♩' }}</span></button>
+        </div>
+        <button class="game-fab__trigger" :aria-label="fabOpen ? '收合遊戲快捷操作' : '開啟遊戲快捷操作'" :aria-expanded="fabOpen" @click="fabOpen = !fabOpen"><span aria-hidden="true">{{ fabOpen ? '×' : '☾' }}</span></button>
+      </div>
+      <WardrobeModal
+        v-if="wardrobeOpen"
+        :appearance="appearance"
+        :unlocked-ids="unlockedIds"
+        @close="closeWardrobe"
+        @select-hair="(id) => emit('select-hair', id)"
+        @select-outfit="(id) => emit('select-outfit', id)"
+      />
       <p class="sr-only">{{ currentLevel.cue }}。可使用 A、S、D、F 鍵或點擊按鍵遊玩。目前漏拍 {{ missCount }} 次。</p>
     </div>
   </div>

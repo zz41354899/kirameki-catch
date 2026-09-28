@@ -1,7 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { makeItem, resolveCatch, isCaught, difficulties } from './game.js'
 import { createRhythmNote, getRhythmLevelForNote, judgeRhythmNote, rhythmLevels, totalRhythmNotes } from './rhythmGame.js'
+import { getCompletionRewards, getDanceFrameSource, getSadFrameSource, isWardrobeCardUnlocked } from './data/wardrobe.js'
 test('candy, star and five-catch combo have correct scores', () => {
   assert.deepEqual(resolveCatch(0,0,'candy'),{score:10,combo:1,delta:10})
   assert.deepEqual(resolveCatch(40,4,'star'),{score:100,combo:5,delta:60})
@@ -50,4 +53,46 @@ test('rhythm judgment respects each stages generous hit window', () => {
   assert.deepEqual(judgeRhythmNote(note, 1000 + note.hitAtMs), { distance: 0, hittable: true, perfect: true })
   assert.equal(judgeRhythmNote(note, 1000 + note.hitAtMs + note.perfectWindowMs + 1).perfect, false)
   assert.equal(judgeRhythmNote(note, 1000 + note.hitAtMs + note.hitWindowMs + 1).hittable, false)
+})
+
+test('wardrobe rewards unlock hair and outfit independently', () => {
+  assert.deepEqual(getCompletionRewards({ completed: true, levelMisses: [0, 2, 1], missCount: 3, recoveredAfterMiss: true }), ['crescentPony', 'practice'])
+  assert.deepEqual(getCompletionRewards({ completed: true, levelMisses: [0, 0, 0], missCount: 0, recoveredAfterMiss: false }), ['crescentPony'])
+  assert.deepEqual(getCompletionRewards({ completed: false, levelMisses: [0, 0, 0], missCount: 0 }), [])
+})
+
+test('the sixth card requires both wardrobe rewards', () => {
+  assert.equal(isWardrobeCardUnlocked([]), false)
+  assert.equal(isWardrobeCardUnlocked(['crescentPony']), false)
+  assert.equal(isWardrobeCardUnlocked(['practice']), false)
+  assert.equal(isWardrobeCardUnlocked(['crescentPony', 'practice']), true)
+})
+
+test('every hair and outfit combination resolves to its own WebP sequence', () => {
+  assert.equal(getDanceFrameSource('classic', 'debut', 0), '/images/momo-moon-rabbit-dance-01.webp')
+  assert.equal(getDanceFrameSource('classic', 'practice', 7), '/images/momo-moon-rabbit-classic-practice-dance-08.webp')
+  assert.equal(getDanceFrameSource('crescentPony', 'debut', 2), '/images/momo-moon-rabbit-crescentPony-debut-dance-03.webp')
+  assert.equal(getDanceFrameSource('crescentPony', 'practice', 4), '/images/momo-moon-rabbit-practice-dance-05.webp')
+  assert.equal(getSadFrameSource('classic', 'practice'), '/images/momo-moon-rabbit-classic-practice-sad.webp')
+})
+
+test('every wardrobe combination has eight independent dance frames and one sad frame', () => {
+  const combinations = [
+    ['classic', 'debut'],
+    ['classic', 'practice'],
+    ['crescentPony', 'debut'],
+    ['crescentPony', 'practice'],
+  ]
+
+  for (const [hairId, outfitId] of combinations) {
+    const danceSources = Array.from({ length: 8 }, (_, frame) => getDanceFrameSource(hairId, outfitId, frame))
+    const allSources = [...danceSources, getSadFrameSource(hairId, outfitId)]
+
+    assert.equal(new Set(allSources).size, 9)
+    for (const source of allSources) {
+      const publicFile = fileURLToPath(new URL(`../public${source}`, import.meta.url))
+      assert.equal(source.endsWith('.webp'), true)
+      assert.equal(existsSync(publicFile), true, `missing wardrobe asset: ${source}`)
+    }
+  }
 })

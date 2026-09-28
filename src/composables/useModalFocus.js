@@ -10,7 +10,7 @@ const focusableSelector = [
 ].join(',')
 
 export function useModalFocus(container, close) {
-  const previousFocus = document.activeElement
+  let previousFocus
 
   function handleKeydown(event) {
     if (event.key === 'Escape') {
@@ -33,6 +33,7 @@ export function useModalFocus(container, close) {
   }
 
   onMounted(() => {
+    previousFocus = document.activeElement
     container.value.querySelector(focusableSelector)?.focus()
     document.addEventListener('keydown', handleKeydown)
   })

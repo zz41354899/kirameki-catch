@@ -7,17 +7,16 @@ const props = defineProps({ activeStory: Number, stories: { type: Array, require
 const emit = defineEmits(['select'])
 const currentStory = computed(() => props.stories[props.activeStory])
 
-function selectStory(index, event) {
-  if (event.type === 'click' && event.detail > 0) return
+function selectStory(index) {
   emit('select', index)
 }
 
 watch(() => props.activeStory, () => {
   if (prefersReducedMotion()) return
   nextTick(() => {
-    gsap.fromTo('.story-copy > *', { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out', clearProps: 'all' })
-    gsap.fromTo('.story-visual > *', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, stagger: 0.06, ease: 'power3.out', clearProps: 'all' })
-    gsap.fromTo('.story-character', { y: 24, scale: 0.96, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.65, ease: 'power3.out', clearProps: 'all' })
+    gsap.fromTo('.story-copy > *', { y: 20 }, { y: 0, duration: 0.42, stagger: 0.035, ease: 'power3.out', clearProps: 'transform', overwrite: true })
+    gsap.fromTo('.story-visual > *', { y: 12 }, { y: 0, duration: 0.4, stagger: 0.04, ease: 'power3.out', clearProps: 'transform', overwrite: true })
+    gsap.fromTo('.story-character.is-active', { y: 16, scale: 0.98 }, { y: 0, scale: 1, duration: 0.48, ease: 'power3.out', clearProps: 'transform', overwrite: true })
   })
 })
 </script>
@@ -33,10 +32,12 @@ watch(() => props.activeStory, () => {
           <div v-for="setting in currentStory.settings" :key="setting.term"><dt>{{ setting.term }}</dt><dd>{{ setting.value }}</dd></div>
         </dl>
       </div>
-      <div class="story-portrait"><img :key="currentStory.image" class="story-character" :src="currentStory.image" :alt="`${currentStory.label}：${currentStory.word}立繪`" loading="lazy" decoding="async" /></div>
+      <div class="story-portrait" :class="`story-portrait--${activeStory + 1}`">
+        <img v-for="(item, index) in stories" :key="item.image" class="story-character" :class="{ 'is-active': index === activeStory }" :src="item.image" :alt="index === activeStory ? `${item.label}：${item.word}立繪` : ''" :aria-hidden="index !== activeStory" loading="lazy" decoding="async" />
+      </div>
       <div class="story-visual" aria-hidden="true"><span>{{ currentStory.en }}</span><b>0{{ activeStory + 1 }}</b><i>{{ currentStory.label }}</i></div>
       <nav class="story-tabs" aria-label="角色介紹段落">
-        <button v-for="(item, index) in stories" :key="item.en" :class="{ active: index === activeStory }" :aria-pressed="index === activeStory" @pointerdown.stop="selectStory(index, $event)" @click="selectStory(index, $event)"><b>0{{ index + 1 }}</b><span>{{ item.en }}<small>{{ item.label }}</small></span></button>
+        <button v-for="(item, index) in stories" :key="item.en" :class="{ active: index === activeStory }" :aria-pressed="index === activeStory" @click.stop="selectStory(index)"><b>0{{ index + 1 }}</b><span>{{ item.en }}<small>{{ item.label }}</small></span></button>
       </nav>
       <p class="story-hint">滾動認識モモ</p>
     </div>

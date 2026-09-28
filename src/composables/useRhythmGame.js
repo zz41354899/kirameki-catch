@@ -38,6 +38,10 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
   const currentLevel = computed(() => rhythmLevels[currentLevelIndex.value])
   const isCrying = ref(false)
   const missCount = ref(0)
+  const levelMisses = ref([0, 0, 0])
+  const recoveryHits = ref(0)
+  const recoveredAfterMiss = ref(false)
+  const completedAllStages = ref(true)
   let spawnTimer
   let finishTimer
   let completionTimer
@@ -64,6 +68,8 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     gameCombo.value = 0
     gameStatus.value = 'MISS'
     missCount.value += 1
+    levelMisses.value = levelMisses.value.map((count, index) => index === currentLevelIndex.value ? count + 1 : count)
+    recoveryHits.value = 0
     isCrying.value = true
     clearTimeout(cryTimer)
     cryTimer = window.setTimeout(() => { isCrying.value = false }, 1100)
@@ -93,7 +99,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     return note
   }
 
-  function finishGame() {
+  function finishGame(completed = true) {
     clearGameTimers()
     finishDueAt = 0
     gameActive.value = false
@@ -101,13 +107,14 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     gameUnlocked.value = true
     gameProgress.value = 1
     isCrying.value = false
-    gameStatus.value = gameScore.value >= 900 ? 'ENCORE!' : 'CLEAR!'
+    completedAllStages.value = completed
+    gameStatus.value = completed ? (gameScore.value >= 900 ? 'ENCORE!' : 'CLEAR!') : 'SEE YOU!'
     completionTimer = window.setTimeout(sendHeart, prefersReducedMotion() ? 50 : 650)
   }
 
   function endGameEarly() {
     if (!gameActive.value) return
-    finishGame()
+    finishGame(false)
   }
 
   function scheduleFinish(delay) {
@@ -147,6 +154,10 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     letterSending.value = false
     isCrying.value = false
     missCount.value = 0
+    levelMisses.value = [0, 0, 0]
+    recoveryHits.value = 0
+    recoveredAfterMiss.value = false
+    completedAllStages.value = true
     currentLevelIndex.value = 0
     danceFrame.value = 0
     lanePoseTurns = [0, 0, 0, 0]
@@ -215,6 +226,10 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     const perfect = judgment.perfect
     gameScore.value += perfect ? 100 : 60
     gameCombo.value += 1
+    if (missCount.value > 0 && !recoveredAfterMiss.value) {
+      recoveryHits.value += 1
+      if (recoveryHits.value >= 5) recoveredAfterMiss.value = true
+    }
     gameStatus.value = perfect ? 'PERFECT!' : 'GOOD!'
     const poses = laneDanceFrames[lane]
     danceFrame.value = poses[lanePoseTurns[lane] % poses.length]
@@ -238,7 +253,13 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     if (!gameUnlocked.value || letterSending.value) return
     letterSending.value = true
     nextTick(() => {
-      const complete = () => onComplete({ score: gameScore.value })
+      const complete = () => onComplete({
+        score: gameScore.value,
+        completed: completedAllStages.value,
+        missCount: missCount.value,
+        levelMisses: levelMisses.value,
+        recoveredAfterMiss: recoveredAfterMiss.value,
+      })
       if (prefersReducedMotion()) {
         letterSending.value = false
         complete()

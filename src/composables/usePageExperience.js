@@ -8,19 +8,12 @@ export function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-function waitForDecodedImage(image) {
-  if (typeof image.decode === 'function') return image.decode().catch(() => {})
-  if (image.complete) return Promise.resolve()
-  return new Promise((resolve) => {
-    image.addEventListener('load', resolve, { once: true })
-    image.addEventListener('error', resolve, { once: true })
-  })
-}
-
-export function usePageExperience(root, activeStory, storyCount) {
-  const introVisible = ref(true)
+export function usePageExperience(root, activeStory, storyCount, { skipOpening = false } = {}) {
+  const introVisible = ref(!skipOpening)
   const introLoadingComplete = ref(false)
-  const introLoadingProgress = ref(0)
+  const introLoadingProgress = ref(10)
+  const introFrame = ref(0)
+  const entryFlash = ref(false)
   const scrollProgress = ref(0)
   const cursorVisible = ref(false)
   const cursorHearts = ref([])
@@ -31,55 +24,35 @@ export function usePageExperience(root, activeStory, storyCount) {
     return 'YOUR CARD'
   })
   let context
+  let heroFocusMedia
   let introTimeline
-  let introExitTimeline
-  let heroEntranceTimeline
   let disposed = false
-  function playHeroEntrance() {
-    if (prefersReducedMotion()) return
-    const shell = root.value?.querySelector('.site-shell')
-    if (!shell) return
 
-    gsap.set('.site-header', { y: -26, autoAlpha: 0 })
-    gsap.set('.hero-character', { x: -110, rotation: -5, autoAlpha: 0 })
-    gsap.set('.hero-rabbit-mark', { scale: 0.55, autoAlpha: 0 })
-    gsap.set('.hero-kicker', { y: 18, autoAlpha: 0 })
-    gsap.set('.hero-title span', { y: 70, autoAlpha: 0 })
-    gsap.set('.hero-intro, .hero-scroll-cue', { y: 20, autoAlpha: 0 })
-
-    heroEntranceTimeline = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } })
-      .to('.site-header', { y: 0, autoAlpha: 1, duration: 0.5 })
-      .to('.hero-character', { x: 0, rotation: 0, autoAlpha: 1, duration: 0.92, ease: 'back.out(1.25)' }, '-=.22')
-      .to('.hero-rabbit-mark', { scale: 1, autoAlpha: 1, duration: 0.42, stagger: 0.08 }, '-=.58')
-      .to('.hero-kicker', { y: 0, autoAlpha: 1, duration: 0.45 }, '-=.18')
-      .to('.hero-title span', { y: 0, autoAlpha: 1, duration: 0.68, stagger: 0.1 }, '-=.16')
-      .to('.hero-intro', { y: 0, autoAlpha: 1, duration: 0.5 }, '-=.24')
-      .to('.hero-scroll-cue', { y: 0, autoAlpha: 1, duration: 0.45 }, '-=.24')
-    return heroEntranceTimeline
-  }
-
-  function dismissIntro() {
-    if (prefersReducedMotion()) {
+  function startIntro() {
+    if (skipOpening || disposed || prefersReducedMotion()) {
       introVisible.value = false
       return
     }
-    const shell = root.value?.querySelector('.site-shell')
-    if (!shell) {
-      introVisible.value = false
-      return
-    }
-    const heroEntrance = playHeroEntrance()
-    introExitTimeline = gsap.timeline({
+
+    const introState = { frame: 0, progress: 10 }
+    introTimeline = gsap.timeline({
       onComplete: () => {
         introVisible.value = false
-        nextTick(() => {
-          gsap.set(shell, { clearProps: 'opacity' })
-        })
+        entryFlash.value = true
+      },
+    }).to(introState, {
+      frame: 23,
+      progress: 100,
+      duration: 3.12,
+      ease: 'none',
+      onUpdate: () => {
+        introFrame.value = Math.round(introState.frame)
+        introLoadingProgress.value = Math.round(introState.progress)
       },
     })
-      .to('.intro-screen', { scale: 1.06, opacity: 0, duration: 0.64, ease: 'power2.inOut' })
-      .to(shell, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '<0.18')
-      .call(() => heroEntrance?.play(), [], 0)
+      .call(() => { introLoadingComplete.value = true })
+      .to({}, { duration: 0.38 })
+      .to('.intro-screen', { opacity: 0, scale: 1.035, duration: 0.46, ease: 'power2.inOut' })
   }
 
   function onPointerMove(event) {
@@ -117,73 +90,91 @@ export function usePageExperience(root, activeStory, storyCount) {
 
   onMounted(() => {
     context = gsap.context(() => {
-      if (!prefersReducedMotion()) {
-        const introFrames = gsap.utils.toArray('.intro-rabbit--frame')
-        const loadingMeter = { value: 0 }
-        const frameDuration = 0.12
-        const turnFrames = Array.from({ length: 24 }, (_, step) => {
-          const turn = step + 1
-          return {
-            index: turn % 24,
-            progress: 10 + (90 * turn) / 24,
-            y: Math.sin((turn / 24) * Math.PI * 2) * 2.5,
-            rotationZ: Math.cos((turn / 24) * Math.PI * 2) * 0.9,
-          }
-        })
-        const updateLoadingMeter = () => { introLoadingProgress.value = Math.round(loadingMeter.value) }
-        introTimeline = gsap.timeline({ paused: true, onComplete: dismissIntro })
-          .to('.intro-loading', { opacity: 1, duration: 0.01, ease: 'none' })
-          .set(introFrames, { opacity: 0 })
-          .set(introFrames[0], { opacity: 1 })
-          .set(loadingMeter, { value: 10, onUpdate: updateLoadingMeter })
-          .fromTo('.intro-rabbit-head', { scale: .72, y: 18, rotationZ: -3, opacity: 0 }, {
-            scale: 1,
-            y: 0,
-            rotationZ: 0,
-            opacity: 1, duration: 0.42,
-            ease: 'back.out(1.6)',
-          }, '<')
-        let previousIndex = 0
-        turnFrames.forEach(({ index, progress, y, rotationZ }) => {
-          introTimeline
-            .set(introFrames[previousIndex], { opacity: 0 })
-            .set(introFrames[index], { opacity: 1 })
-            .to(loadingMeter, { value: progress, duration: frameDuration, ease: 'none', onUpdate: updateLoadingMeter })
-            .to('.intro-rabbit-head', { y, rotationZ, duration: frameDuration, ease: 'sine.inOut' }, '<')
-          previousIndex = index
-        })
-        introTimeline
-          .call(() => { introLoadingComplete.value = true })
-          .to('.intro-loading', { scale: 1.08, duration: 0.24, ease: 'power2.out' })
-          .to('.intro-rabbit-head', { y: -34, scale: 1.1, opacity: 0, duration: 0.2, ease: 'power2.in' }, '+=.62')
-      } else {
-        introVisible.value = false
-      }
       ScrollTrigger.create({ start: 0, end: 'max', onUpdate: (self) => { scrollProgress.value = self.progress } })
+      if (!prefersReducedMotion()) {
+        heroFocusMedia = gsap.matchMedia()
+        heroFocusMedia.add('(min-width: 768px)', () => {
+          const focusTimeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: '.hero-section',
+              start: 'top top',
+              end: () => `+=${Math.round(window.innerHeight * 1.15)}`,
+              pin: true,
+              anticipatePin: 1,
+              scrub: 0.45,
+              invalidateOnRefresh: true,
+            },
+          })
+
+          focusTimeline
+            .to('.hero-character-stage', { yPercent: -2, scale: 1.03, duration: 0.48, ease: 'none' }, 0)
+            .to('.hero-copy', { y: -24, autoAlpha: 0.3, duration: 0.34, ease: 'none' }, 0.16)
+            .to('.hero-rabbit-mark', { autoAlpha: 0.14, duration: 0.28, ease: 'none' }, 0.2)
+            .to('.hero-stage-loop', { autoAlpha: 0.34, duration: 0.4, ease: 'none' }, 0.56)
+            .to('.hero-character-stage', { yPercent: -4, scale: 1.05, duration: 0.44, ease: 'none' }, 0.56)
+            .to('.hero-section', { backgroundColor: '#190a22', duration: 0.44, ease: 'none' }, 0.56)
+        })
+      }
       ScrollTrigger.create({
         trigger: '.story-section',
         start: 'top top',
         end: 'bottom bottom',
-        onUpdate: (self) => { activeStory.value = Math.min(storyCount - 1, Math.floor(self.progress * storyCount)) },
+        snap: prefersReducedMotion() ? false : {
+          snapTo: (progress) => {
+            const step = storyCount > 1 ? 1 / (storyCount - 1) : 1
+            return Math.round(progress / step) * step
+          },
+          duration: { min: 0.18, max: 0.42 },
+          delay: 0.12,
+          ease: 'power2.inOut',
+          directional: false,
+        },
+        onUpdate: (self) => {
+          const nextStory = Math.min(
+            storyCount - 1,
+            Math.round(self.progress * Math.max(1, storyCount - 1)),
+          )
+          if (nextStory !== activeStory.value) activeStory.value = nextStory
+        },
       })
-      gsap.to('.story-character', { yPercent: -10, rotation: 2, ease: 'none', scrollTrigger: { trigger: '.story-section', start: 'top bottom', end: 'bottom top', scrub: 0.7 } })
+      gsap.to('.story-portrait', { yPercent: -4, rotation: 1.2, ease: 'none', scrollTrigger: { trigger: '.story-section', start: 'top bottom', end: 'bottom top', scrub: 0.7 } })
+      if (!prefersReducedMotion()) {
+        const danceTimeline = gsap.timeline({
+          defaults: { ease: 'power3.out' },
+          scrollTrigger: {
+            trigger: '.dance-section',
+            start: 'top 78%',
+            toggleActions: 'restart none restart none',
+          },
+        })
+
+        danceTimeline
+          .from('.dance-cta', { clipPath: 'inset(7% 4% 7% 4%)', autoAlpha: 0, duration: 0.72, ease: 'power3.inOut', clearProps: 'clipPath,opacity,visibility' })
+          .from('.cta-visual', { xPercent: -7, autoAlpha: 0, duration: 0.62, clearProps: 'transform,opacity,visibility' }, 0.12)
+          .from('.cta-visual img', { yPercent: 8, scale: 0.9, rotation: -3, autoAlpha: 0, duration: 0.82, ease: 'back.out(1.18)', clearProps: 'transform,opacity,visibility' }, 0.2)
+          .from('.cta-copy', { xPercent: 7, autoAlpha: 0, duration: 0.62, clearProps: 'transform,opacity,visibility' }, 0.18)
+          .from('.cta-copy > p, .cta-copy h2, .cta-copy > span, .cta-play, .cta-card', { y: 24, autoAlpha: 0, duration: 0.46, stagger: 0.065, clearProps: 'transform,opacity,visibility' }, 0.38)
+      }
       gsap.utils.toArray('.reveal-up').forEach((element) => {
         gsap.from(element, { y: 55, opacity: 0, duration: 0.9, ease: 'power3.out', clearProps: 'all', scrollTrigger: { trigger: element, start: 'top 86%', once: true } })
       })
     }, root.value)
-    if (introTimeline) {
-      const images = root.value?.querySelectorAll('.intro-rabbit') ?? []
-      Promise.all([...images].map(waitForDecodedImage)).then(() => {
-        if (!disposed) introTimeline.play()
-      })
+    const scheduleIntro = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(startIntro, { timeout: 1600 })
+      } else {
+        window.setTimeout(startIntro, 800)
+      }
     }
+    if (document.readyState === 'complete') scheduleIntro()
+    else window.addEventListener('load', scheduleIntro, { once: true })
     document.fonts.ready.then(() => ScrollTrigger.refresh())
   })
 
   onBeforeUnmount(() => {
     disposed = true
-    introExitTimeline?.kill()
-    heroEntranceTimeline?.kill()
+    introTimeline?.kill()
+    heroFocusMedia?.revert()
     context?.revert()
   })
 
@@ -191,6 +182,8 @@ export function usePageExperience(root, activeStory, storyCount) {
     introVisible,
     introLoadingComplete,
     introLoadingProgress,
+    introFrame,
+    entryFlash,
     scrollProgress,
     activeSectionLabel,
     cursorVisible,
