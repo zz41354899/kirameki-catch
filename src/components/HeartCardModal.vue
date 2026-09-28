@@ -150,8 +150,8 @@ async function downloadCard() {
       ctx.drawImage(character, canvas.width - height * ratio + (landscape ? 45 : 110), landscape ? 150 : 390, height * ratio, height)
     }
     const link = document.createElement('a')
-    link.download = `momo-heart-card-${Date.now()}.webp`
-    link.href = canvas.toDataURL('image/webp', 0.92)
+    link.download = `momo-heart-card-${Date.now()}.png`
+    link.href = canvas.toDataURL('image/png')
     link.click()
     downloadStatus.value = '月光小卡已收藏。'
   } catch {
@@ -180,7 +180,7 @@ async function downloadCard() {
           <small id="card-copy-note" class="card-copy-note">已輸入 {{ cardTextCount }} / {{ cardTextCapacity }} 字，最多三行，會依卡面比例自動收好。</small>
           <fieldset v-if="cardLayout !== 'scene'"><legend>今晚想收下哪一種月色？</legend><button v-for="tone in [{ id: 'moonlight', label: '粉月微光' }, { id: 'osmanthus', label: '桂花暖金' }, { id: 'night', label: '紫夜星河' }]" :key="tone.id" :class="tone.id" :aria-pressed="cardTone === tone.id" @click="cardTone = tone.id">{{ tone.label }}</button></fieldset>
           <fieldset><legend>小卡比例</legend><button :aria-pressed="cardOrientation === 'portrait'" @click="cardOrientation = 'portrait'">直式</button><button :aria-pressed="cardOrientation === 'landscape'" @click="cardOrientation = 'landscape'">橫式</button></fieldset>
-          <button class="download-card" @click="downloadCard">收藏月光小卡 WEBP</button>
+          <button class="download-card" @click="downloadCard">收藏月光小卡 PNG</button>
           <p class="download-status" role="status">{{ downloadStatus }}</p>
         </div>
       </div>
