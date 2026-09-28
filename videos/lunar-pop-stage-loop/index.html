@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Lunar Pop Stage Loop</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root { --ink: #100713; --neon: #ff4da2; --moonlight: #ffe7b7; --sakura: #f8b2d0; }
+      * { box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; margin: 0; overflow: hidden; background: var(--ink); }
+      #stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--ink); }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+      #world { position: absolute; inset: -48px; transform-origin: center; will-change: transform; }
+      #stage-art { display: block; width: 100%; height: 100%; object-fit: cover; }
+      #moon-breath { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 29% 39% at 36% 34%, #fff5d46b 0%, #ffe7b72e 43%, transparent 72%); mix-blend-mode: screen; will-change: transform, opacity; }
+      #neon-breath { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 39% 52% at 50% 42%, transparent 46%, #ff4da26b 73%, transparent 90%); mix-blend-mode: screen; will-change: opacity; }
+      .stage-light { position: absolute; top: -18%; width: 42%; height: 106%; pointer-events: none; opacity: .08; mix-blend-mode: screen; will-change: transform, opacity; }
+      #stage-light-left { left: -10%; background: linear-gradient(116deg, transparent 18%, #ffb4d455 52%, transparent 79%); transform-origin: 8% 0%; }
+      #stage-light-right { right: -11%; background: linear-gradient(64deg, transparent 18%, #ffd3814a 52%, transparent 79%); transform-origin: 92% 0%; }
+      #floor-glow { position: absolute; left: 16%; bottom: -12%; width: 82%; height: 43%; pointer-events: none; opacity: .12; background: radial-gradient(ellipse at center, #fff1bf70 0%, #ff4da23a 40%, transparent 72%); mix-blend-mode: screen; transform-origin: center bottom; will-change: transform, opacity; }
+      #floor-ripple { position: absolute; left: 5%; bottom: -17%; width: 90%; height: 43%; border: 4px solid #ffe4a966; border-radius: 50%; pointer-events: none; opacity: .05; box-shadow: 0 0 28px #ff4da266, inset 0 0 26px #fff3c433; mix-blend-mode: screen; transform-origin: center; will-change: transform, opacity; }
+      #light-sweep { position: absolute; inset: -10%; pointer-events: none; opacity: .07; background: linear-gradient(112deg, transparent 39%, #fff0d13d 46%, #ff83bd8a 51%, #fff0d13d 56%, transparent 63%); mix-blend-mode: screen; will-change: transform, opacity; }
+      .petal { position: absolute; width: 24px; height: 15px; border-radius: 90% 12% 90% 12%; background: linear-gradient(135deg, #ffe1ee, var(--sakura)); box-shadow: 0 0 14px #ff92c688; opacity: .72; transform-origin: 50% 50%; }
+      #petal-1 { left: 10%; top: 30%; } #petal-2 { left: 18%; top: 62%; width: 16px; height: 11px; } #petal-3 { left: 48%; top: 20%; width: 17px; height: 11px; } #petal-4 { left: 69%; top: 44%; width: 21px; height: 13px; } #petal-5 { left: 82%; top: 25%; width: 14px; height: 10px; } #petal-6 { left: 91%; top: 70%; width: 19px; height: 12px; } #petal-7 { left: 38%; top: 77%; width: 15px; height: 10px; }
+      .petal--foreground { width: 38px; height: 24px; opacity: .9; box-shadow: 0 0 22px #ff92c6aa; }
+      #petal-8 { left: 3%; top: 73%; } #petal-9 { left: 84%; top: 17%; width: 31px; height: 20px; } #petal-10 { left: 58%; top: 85%; width: 34px; height: 22px; }
+      #soft-vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 52%, #1007132b 100%); }
+    </style>
+  </head>
+  <body>
+    <div id="stage" data-composition-id="lunar-pop-stage-loop" data-start="0" data-duration="6" data-fps="30" data-width="1920" data-height="1080">
+      <section id="loop-scene" class="clip" data-start="0" data-duration="6" data-track-index="0">
+        <div id="world"><img id="stage-art" src="./assets/lunar-pop-stage-bg-v1.webp" alt="Lunar Pop moon stage" /></div>
+        <div id="moon-breath"></div><div id="neon-breath"></div>
+        <div id="stage-light-left" class="stage-light"></div><div id="stage-light-right" class="stage-light"></div>
+        <div id="floor-glow"></div><div id="floor-ripple"></div><div id="light-sweep"></div>
+        <i id="petal-1" class="petal"></i><i id="petal-2" class="petal"></i><i id="petal-3" class="petal"></i><i id="petal-4" class="petal"></i><i id="petal-5" class="petal"></i><i id="petal-6" class="petal"></i><i id="petal-7" class="petal"></i>
+        <i id="petal-8" class="petal petal--foreground"></i><i id="petal-9" class="petal petal--foreground"></i><i id="petal-10" class="petal petal--foreground"></i>
+        <div id="soft-vignette"></div>
+      </section>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const loopEase = 'sine.inOut';
+
+      tl.addLabel('loop-start', 0)
+        .fromTo('#world', { x: -24, y: -11, scale: 1.035 }, { x: 24, y: 11, scale: 1.075, duration: 3, ease: loopEase }, 0)
+        .to('#world', { x: -24, y: -11, scale: 1.035, duration: 3, ease: loopEase }, 3)
+        .fromTo('#moon-breath', { opacity: .22, scale: .94 }, { opacity: .94, scale: 1.09, duration: 3, ease: loopEase }, 0)
+        .to('#moon-breath', { opacity: .22, scale: .94, duration: 3, ease: loopEase }, 3)
+        .fromTo('#neon-breath', { opacity: .26 }, { opacity: 1, duration: 3, ease: loopEase }, 0)
+        .to('#neon-breath', { opacity: .26, duration: 3, ease: loopEase }, 3)
+        .fromTo('#stage-light-left', { opacity: .04, x: -80, rotation: -5 }, { opacity: .48, x: 82, rotation: 4, duration: 3, ease: loopEase }, 0)
+        .to('#stage-light-left', { opacity: .04, x: -80, rotation: -5, duration: 3, ease: loopEase }, 3)
+        .fromTo('#stage-light-right', { opacity: .04, x: 76, rotation: 5 }, { opacity: .44, x: -84, rotation: -4, duration: 3, ease: loopEase }, 0)
+        .to('#stage-light-right', { opacity: .04, x: 76, rotation: 5, duration: 3, ease: loopEase }, 3)
+        .fromTo('#floor-glow', { opacity: .08, scaleX: .86, scaleY: .82 }, { opacity: .58, scaleX: 1.18, scaleY: 1.12, duration: 3, ease: loopEase }, 0)
+        .to('#floor-glow', { opacity: .08, scaleX: .86, scaleY: .82, duration: 3, ease: loopEase }, 3)
+        .fromTo('#floor-ripple', { opacity: .04, scaleX: .78, scaleY: .74 }, { opacity: .42, scaleX: 1.1, scaleY: 1.03, duration: 3, ease: loopEase }, 0)
+        .to('#floor-ripple', { opacity: .04, scaleX: .78, scaleY: .74, duration: 3, ease: loopEase }, 3)
+        .fromTo('#light-sweep', { opacity: .04, x: -240 }, { opacity: .48, x: 240, duration: 3, ease: loopEase }, 0)
+        .to('#light-sweep', { opacity: .04, x: -240, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-1', { x: 0, y: 0, rotation: -14, scale: .78, autoAlpha: .58 }, { x: 118, y: 82, rotation: 88, scale: 1, autoAlpha: .82, duration: 3, ease: loopEase }, 0)
+        .to('#petal-1', { x: 0, y: 0, rotation: -14, scale: .78, autoAlpha: .58, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-2', { x: 0, y: 0, rotation: 30, scale: 1, autoAlpha: .64 }, { x: -95, y: -66, rotation: -74, scale: .72, autoAlpha: .34, duration: 3, ease: loopEase }, 0)
+        .to('#petal-2', { x: 0, y: 0, rotation: 30, scale: 1, autoAlpha: .64, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-3', { x: 0, y: 0, rotation: -26, scale: .72, autoAlpha: .38 }, { x: 84, y: 142, rotation: 91, scale: 1.08, autoAlpha: .78, duration: 3, ease: loopEase }, 0)
+        .to('#petal-3', { x: 0, y: 0, rotation: -26, scale: .72, autoAlpha: .38, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-4', { x: 0, y: 0, rotation: 12, scale: .9, autoAlpha: .72 }, { x: -128, y: 67, rotation: -109, scale: .68, autoAlpha: .42, duration: 3, ease: loopEase }, 0)
+        .to('#petal-4', { x: 0, y: 0, rotation: 12, scale: .9, autoAlpha: .72, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-5', { x: 0, y: 0, rotation: 66, scale: .68, autoAlpha: .32 }, { x: 96, y: 112, rotation: 172, scale: 1, autoAlpha: .78, duration: 3, ease: loopEase }, 0)
+        .to('#petal-5', { x: 0, y: 0, rotation: 66, scale: .68, autoAlpha: .32, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-6', { x: 0, y: 0, rotation: -43, scale: 1.05, autoAlpha: .78 }, { x: -103, y: -87, rotation: 60, scale: .7, autoAlpha: .35, duration: 3, ease: loopEase }, 0)
+        .to('#petal-6', { x: 0, y: 0, rotation: -43, scale: 1.05, autoAlpha: .78, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-7', { x: 0, y: 0, rotation: 21, scale: .7, autoAlpha: .32 }, { x: 115, y: -95, rotation: -78, scale: 1.02, autoAlpha: .75, duration: 3, ease: loopEase }, 0)
+        .to('#petal-7', { x: 0, y: 0, rotation: 21, scale: .7, autoAlpha: .32, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-8', { x: 0, y: 0, rotation: -18, scale: .72, autoAlpha: .36 }, { x: 310, y: -190, rotation: 154, scale: 1.2, autoAlpha: .94, duration: 3, ease: loopEase }, 0)
+        .to('#petal-8', { x: 0, y: 0, rotation: -18, scale: .72, autoAlpha: .36, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-9', { x: 0, y: 0, rotation: 44, scale: 1.08, autoAlpha: .82 }, { x: -280, y: 260, rotation: -128, scale: .7, autoAlpha: .38, duration: 3, ease: loopEase }, 0)
+        .to('#petal-9', { x: 0, y: 0, rotation: 44, scale: 1.08, autoAlpha: .82, duration: 3, ease: loopEase }, 3)
+        .fromTo('#petal-10', { x: 0, y: 0, rotation: -35, scale: .7, autoAlpha: .34 }, { x: 210, y: -300, rotation: 132, scale: 1.18, autoAlpha: .9, duration: 3, ease: loopEase }, 0)
+        .to('#petal-10', { x: 0, y: 0, rotation: -35, scale: .7, autoAlpha: .34, duration: 3, ease: loopEase }, 3)
+        .addLabel('loop-end', 6);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines['lunar-pop-stage-loop'] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

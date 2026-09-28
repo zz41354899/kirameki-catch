@@ -1,0 +1,30 @@
+{
+  "category": "kinetic-type",
+  "duration_s": 7,
+  "fps": 30,
+  "canvas": { "w": 1920, "h": 1080, "aspect": "16:9" },
+  "style": "Lunar Pop stage: dark plum, hot pink, warm yellow, a spotlight-revealed moon-rabbit idol, and restrained tactile typography.",
+  "palette": ["#100713", "#190a22", "#ff3d9a", "#f8bfd3", "#ffd36f", "#fff8f0"],
+  "font": "system sans-serif with CJK fallbacks",
+  "beats": [0.25, 1.15, 2.8, 4.3],
+  "export": "mp4",
+  "asset_needs": [
+    { "role": "stage background", "kind": "image", "source": "assets/lunar-pop-stage-bg-v1.webp", "treatment": "none" },
+    { "role": "Momo entrance", "kind": "image", "source": "assets/momo-moon-rabbit-hero-v2.webp", "treatment": "none" },
+    { "role": "Momo happy reaction", "kind": "image", "source": "assets/momo-moon-rabbit-hero-happy-v2.webp", "treatment": "none" },
+    { "role": "rabbit marks", "kind": "image", "source": "assets/lunar-pop-rabbit-mark-v1-small.webp", "treatment": "none" }
+  ],
+  "block": "particle-image-reveal",
+  "customize": {
+    "direction": "center",
+    "accent": "violet",
+    "use": "Reveal the supplied Momo art during the first 2.8 seconds, then hold it beneath the title and happy reaction."
+  },
+  "content": {
+    "scenes": [
+      { "id": "arrival", "start": 0, "end": 2.8, "text": "LUNAR POP CLUB", "emphasis_words": ["月亮偶像"], "emotion": "sparkling entrance", "motion": "particle image reveal, scale grow, word reveal", "beats": [0.25, 1.15] },
+      { "id": "hold", "start": 2.8, "end": 4.3, "text": "今晚，陪伴著你 月亮偶像", "emphasis_words": ["月亮偶像"], "emotion": "confident stage hold", "motion": "subtle stage drift", "beats": [2.8] },
+      { "id": "reaction", "start": 4.3, "end": 7, "text": "摸摸頭，モモ好開心！", "emphasis_words": ["好開心"], "emotion": "playful warmth", "motion": "bounce in, sparkle pulse", "beats": [4.3] }
+    ]
+  }
+}

@@ -32,6 +32,8 @@ export function usePageExperience(root, activeStory, storyCount) {
   })
   let context
   let introTimeline
+  let introExitTimeline
+  let heroEntranceTimeline
   let disposed = false
   function playHeroEntrance() {
     if (prefersReducedMotion()) return
@@ -45,7 +47,7 @@ export function usePageExperience(root, activeStory, storyCount) {
     gsap.set('.hero-title span', { y: 70, autoAlpha: 0 })
     gsap.set('.hero-intro, .hero-scroll-cue', { y: 20, autoAlpha: 0 })
 
-    gsap.timeline({ defaults: { ease: 'power3.out' } })
+    heroEntranceTimeline = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } })
       .to('.site-header', { y: 0, autoAlpha: 1, duration: 0.5 })
       .to('.hero-character', { x: 0, rotation: 0, autoAlpha: 1, duration: 0.92, ease: 'back.out(1.25)' }, '-=.22')
       .to('.hero-rabbit-mark', { scale: 1, autoAlpha: 1, duration: 0.42, stagger: 0.08 }, '-=.58')
@@ -53,6 +55,7 @@ export function usePageExperience(root, activeStory, storyCount) {
       .to('.hero-title span', { y: 0, autoAlpha: 1, duration: 0.68, stagger: 0.1 }, '-=.16')
       .to('.hero-intro', { y: 0, autoAlpha: 1, duration: 0.5 }, '-=.24')
       .to('.hero-scroll-cue', { y: 0, autoAlpha: 1, duration: 0.45 }, '-=.24')
+    return heroEntranceTimeline
   }
 
   function dismissIntro() {
@@ -65,18 +68,18 @@ export function usePageExperience(root, activeStory, storyCount) {
       introVisible.value = false
       return
     }
-    gsap.set('.site-header, .hero-character, .hero-rabbit-mark, .hero-kicker, .hero-title span, .hero-intro, .hero-scroll-cue', { autoAlpha: 0 })
-    gsap.timeline({
+    const heroEntrance = playHeroEntrance()
+    introExitTimeline = gsap.timeline({
       onComplete: () => {
         introVisible.value = false
         nextTick(() => {
           gsap.set(shell, { clearProps: 'opacity' })
-          playHeroEntrance()
         })
       },
     })
       .to('.intro-screen', { scale: 1.06, opacity: 0, duration: 0.64, ease: 'power2.inOut' })
       .to(shell, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '<0.18')
+      .call(() => heroEntrance?.play(), [], 0)
   }
 
   function onPointerMove(event) {
@@ -89,7 +92,6 @@ export function usePageExperience(root, activeStory, storyCount) {
     const x = (event.clientX - rect.left) / rect.width - 0.5
     const y = (event.clientY - rect.top) / rect.height - 0.5
     gsap.to('.hero-character', { x: x * 34, y: y * 20, rotation: x * 1.2, duration: 0.7, ease: 'power3.out', overwrite: true })
-    gsap.to('.hero-giant', { x: x * -20, y: y * -10, duration: 0.9, ease: 'power3.out', overwrite: true })
   }
 
   function spawnCursorHeart(event) {
@@ -165,7 +167,6 @@ export function usePageExperience(root, activeStory, storyCount) {
         onUpdate: (self) => { activeStory.value = Math.min(storyCount - 1, Math.floor(self.progress * storyCount)) },
       })
       gsap.to('.story-character', { yPercent: -10, rotation: 2, ease: 'none', scrollTrigger: { trigger: '.story-section', start: 'top bottom', end: 'bottom top', scrub: 0.7 } })
-      gsap.to('.hero-giant', { yPercent: 30, ease: 'none', scrollTrigger: { trigger: '.hero-section', start: 'top top', end: 'bottom top', scrub: true } })
       gsap.utils.toArray('.reveal-up').forEach((element) => {
         gsap.from(element, { y: 55, opacity: 0, duration: 0.9, ease: 'power3.out', clearProps: 'all', scrollTrigger: { trigger: element, start: 'top 86%', once: true } })
       })
@@ -181,6 +182,8 @@ export function usePageExperience(root, activeStory, storyCount) {
 
   onBeforeUnmount(() => {
     disposed = true
+    introExitTimeline?.kill()
+    heroEntranceTimeline?.kill()
     context?.revert()
   })
 

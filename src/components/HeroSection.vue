@@ -119,6 +119,18 @@ onBeforeUnmount(() => {
 
 <template>
   <section id="top" class="hero-section" aria-labelledby="hero-title">
+    <video
+      class="hero-stage-loop"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/images/lunar-pop-stage-bg-v1.webp"
+      aria-hidden="true"
+    >
+      <source src="/videos/lunar-pop-stage-loop.webm" type="video/webm" />
+    </video>
     <img class="hero-rabbit-mark hero-rabbit-mark--left" src="/images/lunar-pop-rabbit-mark-v1-small.webp" alt="" aria-hidden="true" />
     <img class="hero-rabbit-mark hero-rabbit-mark--right" src="/images/lunar-pop-rabbit-mark-v1-small.webp" alt="" aria-hidden="true" />
     <div class="hero-copy">

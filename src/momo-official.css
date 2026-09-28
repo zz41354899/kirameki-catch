@@ -686,7 +686,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 .intro-rabbit-head .intro-rabbit { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; opacity: 0; max-width: none; will-change: opacity; backface-visibility: hidden; }
-.intro-loading { position: absolute; z-index: 5; top: calc(46% + clamp(165px, 17vw, 230px)); left: 50%; width: min(216px, 62vw); opacity: 0; color: #ffd2e7; pointer-events: none; transform: translateX(-50%); text-align: center; }
+.intro-loading { position: absolute; z-index: 5; top: calc(46% + clamp(165px, 17vw, 230px)); left: 50%; width: min(216px, 62vw); opacity: 1; color: #ffd2e7; pointer-events: none; transform: translateX(-50%); text-align: center; }
 .intro-loading p { margin: 0; }
 .intro-loading-label { font: 800 9px/1 'DM Sans', sans-serif; letter-spacing: .25em; text-shadow: 0 0 14px #ff3d9a99; white-space: nowrap; }
 .intro-loading-value { display: flex; align-items: baseline; justify-content: center; margin-top: 8px !important; color: var(--yellow); text-shadow: 0 0 20px #ffd36f99; }
@@ -739,6 +739,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .lunar-pop .menu-links button:focus-visible i::before { transform: translateX(0); }
 
 @media (prefers-reduced-motion: reduce) {
+  .lunar-pop .hero-section { background: #100713 url('/images/lunar-pop-stage-bg-v1.webp') center/cover; }
+  .lunar-pop .hero-stage-loop { display: none; }
   .lunar-pop .menu-character,
   .lunar-pop .menu-links button,
   .lunar-pop .menu-links button::before,
@@ -748,10 +750,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .lunar-pop .hero-section {
   min-height: 100svh;
-  background: #100713 url('/images/lunar-pop-stage-bg-v1.webp') center/cover;
+  background: #100713;
+}
+
+.lunar-pop .hero-stage-loop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
 }
 
 .lunar-pop .hero-section::before {
+  z-index: 1;
   inset: 0;
   opacity: .3;
   background: #100713;
@@ -759,6 +773,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 .lunar-pop .hero-section::after {
+  z-index: 1;
   inset: 94px 3.2% 3.5%;
   border-color: #ff9dcb4d;
   border-radius: 0;
@@ -866,6 +881,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .lunar-pop .menu-links button span { font-size: clamp(28px, 9vw, 37px); }
   .lunar-pop .menu-links button small { margin-top: 5px; font-size: 7px; }
   .lunar-pop .hero-section { min-height: 850px; background-position: 42% center; }
+  .lunar-pop .hero-stage-loop { object-position: 42% center; }
   .lunar-pop .hero-section::after { inset: 78px 14px 14px; }
   .lunar-pop .hero-copy { top: 12%; left: 7%; right: 7%; }
   .lunar-pop .hero-title { font-size: clamp(58px, 15vw, 76px); }
