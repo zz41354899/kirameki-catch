@@ -1,8 +1,8 @@
-export function scrollToSection(sectionId, { focus = false } = {}) {
+export function scrollToSection(sectionId, { focus = false, instant = false } = {}) {
   const target = document.getElementById(sectionId)
   if (!target) return
 
-  const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+  const behavior = instant || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 
   // A pinned Hero is wrapped by a GSAP spacer. scrollIntoView() can target the
   // transformed element inside that spacer and stop at the animation's end state.

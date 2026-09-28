@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from '#imports'
 import DanceInvite from './components/DanceInvite.vue'
 import HeroSection from './components/HeroSection.vue'
@@ -20,6 +20,7 @@ const menuOpen = ref(false)
 const router = useRouter()
 const route = useRoute()
 const skipOpeningOnReturn = route.query.skipOpening === '1'
+const returnSection = typeof route.query.returnTo === 'string' ? route.query.returnTo : ''
 const { gameCompleted } = useWardrobe()
 const {
   introVisible, introLoadingComplete, introLoadingProgress, introFrame, entryFlash, scrollProgress, activeSectionLabel, cursorVisible, cursorHearts,
@@ -62,9 +63,13 @@ watch(menuOpen, (menu) => {
   document.body.style.overflow = menu ? 'hidden' : ''
 }, { immediate: true })
 
-onMounted(() => {
-  if (skipOpeningOnReturn) router.replace('/')
+onMounted(async () => {
+  if (skipOpeningOnReturn || returnSection) await router.replace('/')
   removeLocationHash()
+  if (!returnSection) return
+
+  await nextTick()
+  scrollToSection(returnSection, { instant: true })
 })
 
 onBeforeUnmount(() => {

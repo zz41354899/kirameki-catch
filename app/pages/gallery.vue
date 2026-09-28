@@ -9,7 +9,7 @@ const { unlockedIds, gameCompleted } = useWardrobe()
 useHead({ title: '月光小卡圖鑑 | 跳躍心動' })
 
 function closeGallery() {
-  router.push({ path: '/', query: { skipOpening: '1' } })
+  router.push({ path: '/', query: { skipOpening: '1', returnTo: 'dance' } })
 }
 </script>
 

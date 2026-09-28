@@ -48,3 +48,35 @@
 - Fidelity surfaces: the existing card typography and editable wish remain unchanged; the dark-left text area keeps contrast, violet/gold wardrobe lighting distinguishes the rare reward, full figure/costume and wardrobe are visible, and `月光衣櫥` remains subject to its existing two-reward lock.
 
 final result: passed
+
+## Mobile dance invite QA — 2026-09-28
+
+### Comparison target
+
+- Source visual truth: `/var/folders/fp/bv98vn2s2v9dchl651zpsvn00000gn/T/TemporaryItems/NSIRD_screencaptureui_axKqHE/截圖 2026-09-28 晚上7.50.51.png`
+- Implementation: browser-rendered `http://localhost:3000/` in the in-app browser.
+- Viewports: 390 × 844 CSS px and 320 × 700 CSS px, density 1.
+- State: the existing footer `月下共舞` control has moved focus/scroll position to the dance invitation; the opening overlay is complete.
+
+### Comparison history
+
+- [P1] On mobile, jumping to the invitation aligned its visual panel beneath the fixed 66px header, hiding the character's head and making the start of the card feel clipped.
+- Fix: the mobile dance section now reserves an 80px scroll margin. The Lunar Pop visual panel now uses the reference's compact 430px height rather than 450px.
+- Post-fix evidence: at 390px the full character is visible below the header before the copy begins; at 320px the figure, frame, kicker, and one-column copy remain within the card with no horizontal page overflow. Browser console contained no warnings or errors.
+
+### Fidelity surfaces
+
+- Typography and copy: existing Traditional-Chinese title, kicker, body copy, and CTA wording are unchanged.
+- Spacing and layout rhythm: the visual-to-copy handoff follows the supplied compact mobile framing; the fixed header no longer overlaps the card's leading artwork after an in-page section jump.
+- Colors and tokens: the existing plum, moonlit scene, pink, and yellow tokens are unchanged.
+- Image quality: the supplied Momo WebP remains the rendered asset; no crop, replacement, or generated asset was introduced.
+- Accessibility and interaction: the semantic footer control still performs the section jump; the CTA remains present after the visual adjustment.
+
+### Checks
+
+- `npm test`: 10 passing.
+- `npm run build`: passing (Nuxt emitted its existing sourcemap warning only).
+- `git diff --check`: passing.
+- Browser: verified at both mobile widths; console errors and warnings: none.
+
+final result: passed

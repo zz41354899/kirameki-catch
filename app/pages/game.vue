@@ -14,7 +14,7 @@ function completeGame(result) {
 }
 
 function closeGame() {
-  router.push({ path: '/', query: { skipOpening: '1' } })
+  router.push({ path: '/', query: { skipOpening: '1', returnTo: 'dance' } })
 }
 </script>
 
