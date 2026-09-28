@@ -64,11 +64,6 @@ async function navigateTo(sectionId) {
   scrollToSection(sectionId)
 }
 
-function navigateToRoute(route) {
-  closeMenu()
-  router.push(route)
-}
-
 function goHome() {
   if (router.currentRoute.value.path === '/') scrollToSection('top')
   else router.push('/')
@@ -118,7 +113,7 @@ onBeforeUnmount(() => menuTimeline?.kill())
       <p>MOONLIGHT MENU</p>
       <button type="button" @click="navigateTo('top')"><span>月下開演<small>跟著月光走進舞台</small></span><i aria-hidden="true">↗</i></button>
       <button type="button" @click="navigateTo('story')"><span>月兔檔案<small>認識今晚的 Momo</small></span><i aria-hidden="true">↗</i></button>
-      <button type="button" @click="navigateToRoute('/game')"><span>節奏遊戲<small>陪我跳完這一首</small></span><i aria-hidden="true">↗</i></button>
+      <button type="button" @click="navigateTo('dance')"><span>節奏遊戲<small>陪我跳完這一首</small></span><i aria-hidden="true">↗</i></button>
     </nav>
   </div>
 </template>
