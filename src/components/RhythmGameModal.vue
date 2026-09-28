@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import MomoSprite from './MomoSprite.vue'
 import WardrobeModal from './WardrobeModal.vue'
-import { getSadFrameSource } from '../data/wardrobe'
+import { getDanceFrameOffset, getSadFrameSource } from '../data/wardrobe'
 import { danceLanes, useRhythmGame } from '../composables/useRhythmGame'
 import { rhythmLevels } from '../rhythmGame'
 import { useModalFocus } from '../composables/useModalFocus'
@@ -34,16 +34,26 @@ function endFromFab() {
   endGameEarly()
 }
 function soundFromFab() {
-  toggleSound()
+  toggleGameSound()
   fabOpen.value = false
 }
 useModalFocus(modal, close)
-const { soundOn, synthTone, enableSound, toggleSound } = useSoundtrack()
+const { soundOn, synthTone, synthPianoTone, enableSound, toggleSound, restartMusic, pauseMusic, resumeMusic } = useSoundtrack()
 const {
   gameActive, gamePaused, gameScore, gameCombo, gameStatus, gameProgress,
   notes, danceFrame, letterSending, currentLevel, currentLevelIndex,
   isCrying, missCount, startGame, endGameEarly, togglePause, hitLane,
-} = useRhythmGame({ enableSound, synthTone, onComplete: (result) => emit('complete', result) })
+} = useRhythmGame({ enableSound, restartMusic, pauseMusic, resumeMusic, synthTone, synthPianoTone, onComplete: (result) => emit('complete', result) })
+const dancerFrameStyle = computed(() => {
+  const { x, y } = getDanceFrameOffset(props.appearance.hairId, props.appearance.outfitId, danceFrame.value)
+  return { '--frame-shift-x': `${x}%`, '--frame-shift-y': `${y}%` }
+})
+
+function toggleGameSound() {
+  const enabling = !soundOn.value
+  toggleSound()
+  if (enabling && gamePaused.value) pauseMusic()
+}
 
 </script>
 
@@ -69,7 +79,7 @@ const {
         <button class="game-wardrobe-toggle" aria-label="前往月光衣櫥" @click="openWardrobe">
           <span aria-hidden="true">✦</span><b>前往衣櫥</b>
         </button>
-        <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleSound">
+        <button class="game-sound" :aria-pressed="soundOn" :aria-label="soundOn ? '關閉遊戲音樂' : '開啟遊戲音樂'" @click="toggleGameSound">
           <span>BGM</span><b>{{ soundOn ? 'ON' : 'OFF' }}</b>
         </button>
         <div class="rhythm-window-actions">
@@ -88,10 +98,12 @@ const {
         <div class="velocity-field" aria-hidden="true"><i v-for="n in 8" :key="n"></i></div>
         <div class="combo-readout"><b>{{ gameCombo }}</b><span>COMBO</span></div>
         <aside class="performer-zone">
-          <Transition name="momo-miss" mode="out-in">
-            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" :src="sadFrameSource" alt="沒有接到節拍而難過的月兔モモ" />
-            <MomoSprite v-else key="dancing" class="game-dancer" :hair-id="appearance.hairId" :outfit-id="appearance.outfitId" :frame="danceFrame" label="跟著節拍跳舞的月兔モモ" />
-          </Transition>
+          <div class="game-dancer game-dancer-anchor">
+            <Transition name="momo-miss" mode="out-in">
+              <img v-if="isCrying" key="crying" class="game-dancer-image crying-dancer" :src="sadFrameSource" alt="沒有接到節拍而難過的月兔モモ" />
+              <MomoSprite v-else key="dancing" class="game-dancer-image" :style="dancerFrameStyle" :hair-id="appearance.hairId" :outfit-id="appearance.outfitId" :frame="danceFrame" label="跟著節拍跳舞的月兔モモ" />
+            </Transition>
+          </div>
           <div class="momo-stage-sign" aria-hidden="true"><b>Momo</b><span>一起跳進月光裡</span></div>
           <div v-if="gameActive" class="game-actions">
             <button @click="togglePause"><b>{{ gamePaused ? '▶' : 'Ⅱ' }}</b>{{ gamePaused ? '繼續' : '暫停' }}</button>
@@ -113,8 +125,8 @@ const {
             <b>{{ gameStatus }}</b><span v-if="isCrying">下一拍慢慢來</span>
           </div>
           <div class="lane-controls" aria-label="舞步按鍵">
-            <button v-for="(lane, index) in danceLanes" :key="lane.key" class="lane-button" :disabled="!gameActive || gamePaused" :aria-label="`${lane.key} 鍵，${lane.label}`" @click="hitLane(index)">
-              <b>{{ lane.key }}</b><span>{{ lane.label }}</span>
+            <button v-for="(lane, index) in danceLanes" :key="lane.key" class="lane-button" :disabled="!gameActive || gamePaused" :aria-label="`${lane.key} 鍵，${lane.syllable}，${lane.label}`" @click="hitLane(index)">
+              <b>{{ lane.key }}</b><span>{{ lane.syllable }} · {{ lane.label }}</span>
             </button>
           </div>
           <div v-if="gamePaused" class="pause-panel" role="status">
@@ -158,7 +170,7 @@ const {
         @select-hair="(id) => emit('select-hair', id)"
         @select-outfit="(id) => emit('select-outfit', id)"
       />
-      <p class="sr-only">{{ currentLevel.cue }}。可使用 A、S、D、F 鍵或點擊按鍵遊玩。目前漏拍 {{ missCount }} 次。</p>
+      <p class="sr-only">{{ currentLevel.cue }}。可使用 Q、W、E、R 鍵演奏 DO、RE、MI、SOL，或點擊按鍵遊玩。目前漏拍 {{ missCount }} 次。</p>
     </div>
   </div>
 </template>

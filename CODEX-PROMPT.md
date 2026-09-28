@@ -47,7 +47,7 @@ Home
 ├── Hero／今天，也要被可愛接住。
 ├── Story／PROFILE、CHARM、DREAM
 ├── Dance Invite／舞蹈與遊戲邀請
-├── Rhythm Game Modal／A、S、D、F 節奏遊戲
+├── Rhythm Game Modal／Q、W、E、R 旋律節奏遊戲
 ├── Heart Card Modal／完成後取得心動小卡
 └── Site Footer／導覽與收尾文案
 ```

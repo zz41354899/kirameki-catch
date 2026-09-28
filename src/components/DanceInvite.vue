@@ -22,7 +22,7 @@ defineProps({
         <p>MOON RABBIT LIVE ☾</p>
         <h2 id="dance-title">和偶像<br>モモ一起<br><em>跳進月光</em></h2>
         <span>四個舞步、一輪滿月。接住每個節拍，讓モモ把今夜專屬的月光小卡送到你手心。</span>
-        <button class="cta-play" @click.stop="onPlay"><b>開始月下共舞</b><small>A · S · D · F / LUNAR RHYTHM</small><i>♡</i></button>
+        <button class="cta-play" @click.stop="onPlay"><b>開始月下共舞</b><small>Q · W · E · R / PIANO MELODY</small><i>♡</i></button>
         <button v-if="cardUnlocked && cardStateReady" type="button" class="cta-card" @click="onOpenCard"><b>再次打開我的心動小卡</b><small>MOONLIGHT CARD · UNLOCKED</small><i aria-hidden="true">♡</i></button>
       </div>
     </div>

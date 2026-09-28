@@ -22,9 +22,22 @@ function getAssetStem(hairId, outfitId) {
   return `momo-moon-rabbit-${hairId}-${outfitId}`
 }
 
+const danceFrameOffsets = Object.freeze({
+  'classic:debut': Object.freeze([[0, 0], [0, 1.17], [0, 0], [0, 0], [0, 0], [0, 0], [0, 1.17], [0, 0]]),
+  'classic:practice': Object.freeze([[0, 0], [-0.35, 0.26], [0, 2.08], [0.35, 1.04], [0, 0.78], [0, -0.26], [1.04, 0], [-0.35, 1.04]]),
+  'crescentPony:debut': Object.freeze([[2.08, 2.34], [0, 1.04], [-2.78, -0.78], [1.04, 0], [-1.39, 0.26], [0.69, 1.04], [0.35, 1.04], [0, -1.04]]),
+  'crescentPony:practice': Object.freeze([[-0.35, 0.26], [-2.78, -1.82], [-4.17, -1.82], [0.69, 0.26], [1.39, 0], [1.39, 0], [1.39, 0], [0, -0.78]]),
+})
+
 export function getDanceFrameSource(hairId, outfitId, frame) {
   const sequence = String(Math.min(8, Math.max(1, Math.floor(frame) + 1))).padStart(2, '0')
   return `/images/${getAssetStem(hairId, outfitId)}-dance-${sequence}.webp`
+}
+
+export function getDanceFrameOffset(hairId, outfitId, frame) {
+  const sequence = danceFrameOffsets[`${hairId}:${outfitId}`] ?? danceFrameOffsets['classic:debut']
+  const [x, y] = sequence[Math.min(7, Math.max(0, Math.floor(frame)))] ?? [0, 0]
+  return { x, y }
 }
 
 export function getSadFrameSource(hairId, outfitId) {

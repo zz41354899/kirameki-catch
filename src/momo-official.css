@@ -259,9 +259,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @keyframes stageRush { from { scale: 1; filter: saturate(1); } to { scale: 1.025; filter: saturate(1.14) brightness(1.04); } }
 .performer-zone { position: relative; min-width: 0; border-right: 1px solid #ef56885c; }
 .performer-zone::after { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, #160d143d, transparent 75%); pointer-events: none; }
-.game-dancer { position: absolute; z-index: 4; left: 7%; bottom: 3%; width: auto; max-width: 96%; height: 91%; filter: drop-shadow(0 20px 24px #160b12a8); }
-.game-dancer.momo-sprite { aspect-ratio: 3 / 4; }
-.crying-dancer { aspect-ratio: 3 / 4; object-fit: contain; object-position: center bottom; }
+.game-dancer { position: absolute; z-index: 4; left: 7%; bottom: 3%; width: auto; max-width: 96%; height: 91%; aspect-ratio: 3 / 4; filter: drop-shadow(0 20px 24px #160b12a8); }
+.game-dancer-image { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; translate: var(--frame-shift-x, 0) var(--frame-shift-y, 0); }
+.crying-dancer { --frame-shift-x: 0%; --frame-shift-y: 0%; }
 .momo-miss-enter-active, .momo-miss-leave-active { transition: opacity .16s ease, transform .22s cubic-bezier(.2,.8,.3,1.25); }
 .momo-miss-enter-from { opacity: 0; transform: translateY(18px) scale(.94); }
 .momo-miss-leave-to { opacity: 0; transform: translateY(8px) scale(.98); }
@@ -721,7 +721,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .performer-zone { position: absolute; z-index: 3; inset: 0; width: 100%; overflow: hidden; border: 0; pointer-events: none; }
   .performer-zone::after { z-index: 5; background: linear-gradient(180deg, #160d141b, transparent 23% 62%, #160d14a8), linear-gradient(90deg, #160d1414, transparent 21% 79%, #160d1414); }
   .game-dancer { left: 50%; bottom: max(128px, calc(env(safe-area-inset-bottom) + 116px)); width: auto; max-width: none; height: min(61svh, 500px); opacity: .86; filter: drop-shadow(0 20px 32px #160b12d4); translate: -50% 0; }
-  .game-dancer.momo-sprite { width: auto; aspect-ratio: 3 / 4; background-size: 400% 200%; }
+  .game-dancer { width: auto; aspect-ratio: 3 / 4; }
   .crying-dancer { width: auto; object-fit: contain; object-position: center bottom; }
   .momo-stage-sign, .game-actions { display: none; }
   .rhythm-playfield { position: absolute; z-index: 4; inset: 0; }

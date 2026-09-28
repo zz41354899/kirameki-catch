@@ -14,7 +14,7 @@ export const storySteps = [
   {
     word: '月下共舞', en: 'RHYTHM', label: '節拍',
     note: '只要你按下第一個節拍，月亮就會為我們打開今晚的舞台。',
-    settings: [{ term: '入場方式', value: 'A · S · D · F' }, { term: '今夜目標', value: '一起跳到滿月' }],
+    settings: [{ term: '入場方式', value: 'Q · W · E · R' }, { term: '今夜目標', value: '一起跳到滿月' }],
     image: '/images/momo-moon-rabbit-rhythm-v1.webp',
   },
 ]

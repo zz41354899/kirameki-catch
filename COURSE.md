@@ -265,7 +265,7 @@ Home
 ├── Hero／今天，也要被可愛接住。
 ├── Story／PROFILE、CHARM、DREAM
 ├── Dance Invite／舞蹈與遊戲邀請
-├── Rhythm Game Modal／A、S、D、F 節奏遊戲
+├── Rhythm Game Modal／Q、W、E、R 旋律節奏遊戲
 ├── Heart Card Modal／完成後取得心動小卡
 └── Site Footer／導覽與收尾文案
 ```
@@ -680,7 +680,7 @@ prefers-reduced-motion 下直接顯示可操作內容。
 ```text
 請保留 RhythmGameModal 的遊戲規則與計分方式。
 
-替成功輸入 A、S、D、F 的操作加入短暫視覺回饋，
+替成功輸入 Q、W、E、R 的旋律操作加入短暫視覺回饋，
 並確認鍵盤、滑鼠與觸控可以完成同一個任務。
 
 不要修改角色文案、關卡長度與解鎖條件。

@@ -133,7 +133,7 @@ Home
 ├── Hero／今天，也要被可愛接住。
 ├── Story／PROFILE、CHARM、DREAM
 ├── Dance Invite／舞蹈與遊戲邀請
-├── Rhythm Game Modal／A、S、D、F 節奏遊戲
+├── Rhythm Game Modal／Q、W、E、R 旋律節奏遊戲
 ├── Heart Card Modal／心動小卡
 └── Footer／導覽與收尾文案
 ```
@@ -146,7 +146,7 @@ Home
 | Hero | 角色主視覺、標題與說明 | Pointer、捲動 | Entrance、stagger、pointer feedback |
 | Story | PROFILE、CHARM、DREAM | 捲動或直接選擇 | Vue state、ScrollTrigger、同步內容 |
 | Dance Invite | 遊戲邀請與角色舞台 | 開始遊戲、打開小卡 | CTA 動態、狀態門檻 |
-| Rhythm Game | A、S、D、F 節奏操作 | 鍵盤、滑鼠、觸控 | 遊戲狀態、計分、焦點管理 |
+| Rhythm Game | Q、W、E、R 旋律節奏操作 | 鍵盤、滑鼠、觸控 | 遊戲狀態、計分、焦點管理 |
 | Heart Card | 完成遊戲後的回饋 | 關閉、再次遊玩 | Modal、解鎖流程 |
 | Footer | 回到首頁、角色介紹或遊戲 | 區段導覽 | 收尾節奏、導覽一致性 |
 

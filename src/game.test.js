@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { makeItem, resolveCatch, isCaught, difficulties } from './game.js'
-import { createRhythmNote, getRhythmLevelForNote, judgeRhythmNote, rhythmLevels, totalRhythmNotes } from './rhythmGame.js'
-import { getCompletionRewards, getDanceFrameSource, getSadFrameSource, isWardrobeCardUnlocked } from './data/wardrobe.js'
+import { createRhythmNote, getRhythmLaneForKey, getRhythmLevelForNote, getRhythmSpawnDelay, judgeRhythmNote, RHYTHM_PULSE_MS, rhythmKeys, rhythmLanes, rhythmLevels, totalRhythmNotes } from './rhythmGame.js'
+import { getCompletionRewards, getDanceFrameOffset, getDanceFrameSource, getSadFrameSource, isWardrobeCardUnlocked } from './data/wardrobe.js'
 test('candy, star and five-catch combo have correct scores', () => {
   assert.deepEqual(resolveCatch(0,0,'candy'),{score:10,combo:1,delta:10})
   assert.deepEqual(resolveCatch(40,4,'star'),{score:100,combo:5,delta:60})
@@ -34,10 +34,20 @@ test('objects stay inside the playfield and hard mode is more demanding', () => 
 test('rhythm game progresses through three escalating difficulties with deterministic lane patterns', () => {
   assert.equal(rhythmLevels.length, 3)
   assert.equal(totalRhythmNotes, 30)
-  assert.deepEqual(rhythmLevels.map(level => level.speedLabel), ['舒緩', '流暢', '光速'])
-  assert.ok(rhythmLevels.every(level => level.intervalMs >= 880 && level.travelMs >= 2800))
+  assert.deepEqual(rhythmLevels.map(level => level.speedLabel), ['舒緩', '流動', '輕快'])
+  assert.ok(rhythmLevels.every(level => level.intervalMs >= 440 && level.travelMs >= 2800))
   assert.ok(rhythmLevels[0].intervalMs > rhythmLevels[1].intervalMs)
   assert.ok(rhythmLevels[1].intervalMs > rhythmLevels[2].intervalMs)
+  assert.deepEqual(rhythmKeys, ['Q', 'W', 'E', 'R'])
+  assert.deepEqual(['q', 'W', 'e', 'R'].map(getRhythmLaneForKey), [0, 1, 2, 3])
+  assert.equal(getRhythmLaneForKey('D'), -1)
+  assert.deepEqual(rhythmLanes.map(lane => lane.syllable), ['DO', 'RE', 'MI', 'SOL'])
+  assert.ok(rhythmLanes.every((lane, index) => index === 0 || lane.frequency > rhythmLanes[index - 1].frequency))
+  assert.ok(rhythmLevels.every(level => level.intervalMs % RHYTHM_PULSE_MS === 0))
+  assert.ok(rhythmLevels.every(level => level.hitAtMs % RHYTHM_PULSE_MS === 0))
+  assert.ok(rhythmLevels.every(level => level.spacingPulses.length === level.pattern.length))
+  assert.ok(rhythmLevels.every(level => level.spacingPulses.every((pulses, index) => index === 0 || pulses >= 2)))
+  assert.ok(Array.from({ length: totalRhythmNotes }, (_, index) => getRhythmSpawnDelay(index)).every(delay => delay % RHYTHM_PULSE_MS === 0))
   for (let index = 0; index < totalRhythmNotes; index += 1) {
     const note = createRhythmNote(index + 1, index, 1000)
     assert.ok(note.lane >= 0 && note.lane <= 3)
@@ -93,6 +103,20 @@ test('every wardrobe combination has eight independent dance frames and one sad 
       const publicFile = fileURLToPath(new URL(`../public${source}`, import.meta.url))
       assert.equal(source.endsWith('.webp'), true)
       assert.equal(existsSync(publicFile), true, `missing wardrobe asset: ${source}`)
+    }
+  }
+})
+
+test('every wardrobe dance frame has a finite visual anchor correction', () => {
+  for (const hairId of ['classic', 'crescentPony']) {
+    for (const outfitId of ['debut', 'practice']) {
+      for (let frame = 0; frame < 8; frame += 1) {
+        const offset = getDanceFrameOffset(hairId, outfitId, frame)
+        assert.equal(Number.isFinite(offset.x), true)
+        assert.equal(Number.isFinite(offset.y), true)
+        assert.ok(Math.abs(offset.x) <= 5)
+        assert.ok(Math.abs(offset.y) <= 3)
+      }
     }
   }
 })

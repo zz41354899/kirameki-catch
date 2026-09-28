@@ -3,18 +3,15 @@ import gsap from 'gsap'
 import { prefersReducedMotion } from './usePageExperience'
 import {
   createRhythmNote,
-  getRhythmLevelForNote,
+  getRhythmLaneForKey,
+  getRhythmSpawnDelay,
   judgeRhythmNote,
+  rhythmLanes,
   rhythmLevels,
   totalRhythmNotes,
 } from '../rhythmGame'
 
-export const danceLanes = [
-  { key: 'A', label: '左拍' },
-  { key: 'S', label: '拍手' },
-  { key: 'D', label: '轉身' },
-  { key: 'F', label: '揮手' },
-]
+export const danceLanes = rhythmLanes
 
 const laneDanceFrames = [
   [1, 2],
@@ -23,7 +20,7 @@ const laneDanceFrames = [
   [7, 0],
 ]
 
-export function useRhythmGame({ enableSound, synthTone, onComplete }) {
+export function useRhythmGame({ enableSound, restartMusic, pauseMusic, resumeMusic, synthTone, synthPianoTone, onComplete }) {
   const gameActive = ref(false)
   const gamePaused = ref(false)
   const gameUnlocked = ref(false)
@@ -51,6 +48,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
   let pauseStartedAt = 0
   let spawnDueAt = 0
   let finishDueAt = 0
+  let lastSpawnDueAt = 0
   let noteId = 0
   let spawnedNotes = 0
   let soundInitialized = false
@@ -64,7 +62,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     noteTimers.clear()
   }
 
-  function showMissReaction() {
+  function showMissReaction(playMissTone = true) {
     gameCombo.value = 0
     gameStatus.value = 'MISS'
     missCount.value += 1
@@ -73,7 +71,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     isCrying.value = true
     clearTimeout(cryTimer)
     cryTimer = window.setTimeout(() => { isCrying.value = false }, 1100)
-    synthTone(196, 0.16, 'sine', 0.035)
+    if (playMissTone) synthTone(196, 0.16, 'sine', 0.035)
   }
 
   function removeNote(id, missed = false) {
@@ -126,10 +124,13 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
   function scheduleNextSpawn(delayOverride) {
     clearTimeout(spawnTimer)
     if (spawnedNotes >= totalRhythmNotes) return
-    const delay = delayOverride ?? getRhythmLevelForNote(spawnedNotes).level.intervalMs
+    const delay = delayOverride ?? getRhythmSpawnDelay(spawnedNotes)
     spawnRemaining = delay
-    spawnDueAt = Date.now() + delay
+    spawnDueAt = delayOverride === undefined && lastSpawnDueAt
+      ? lastSpawnDueAt + delay
+      : Date.now() + delay
     spawnTimer = window.setTimeout(() => {
+      lastSpawnDueAt = spawnDueAt
       spawnDueAt = 0
       const note = spawnNote()
       spawnedNotes += 1
@@ -162,6 +163,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     danceFrame.value = 0
     lanePoseTurns = [0, 0, 0, 0]
     spawnedNotes = 0
+    lastSpawnDueAt = Date.now()
     spawnDueAt = 0
     finishDueAt = 0
     spawnRemaining = 0
@@ -171,6 +173,8 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     if (!soundInitialized) {
       enableSound()
       soundInitialized = true
+    } else {
+      restartMusic()
     }
     gameStatus.value = 'PLAY!'
     spawnNote()
@@ -191,12 +195,14 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
       if (finishDueAt) finishRemaining = Math.max(40, finishDueAt - Date.now())
       noteTimers.forEach((timer) => clearTimeout(timer))
       noteTimers.clear()
+      pauseMusic()
       return
     }
     const pausedFor = Date.now() - pauseStartedAt
     notes.value.forEach((note) => { note.born += pausedFor; scheduleNoteMiss(note) })
     gamePaused.value = false
     gameStatus.value = 'PLAY!'
+    resumeMusic()
     if (spawnedNotes < totalRhythmNotes) scheduleNextSpawn(spawnRemaining)
     else {
       scheduleFinish(finishRemaining)
@@ -205,9 +211,11 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
 
   function hitLane(lane) {
     if (!gameActive.value || gamePaused.value) return
+    const laneTone = rhythmLanes[lane]?.frequency
+    if (laneTone) synthPianoTone(laneTone, 0.82, 0.038)
     const candidates = notes.value.filter((note) => note.lane === lane)
     if (!candidates.length) {
-      showMissReaction()
+      showMissReaction(false)
       return
     }
     const closest = candidates.reduce((best, note) => {
@@ -216,7 +224,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     }, null)
     const judgment = closest ? judgeRhythmNote(closest.note) : null
     if (!closest || !judgment?.hittable) {
-      showMissReaction()
+      showMissReaction(false)
       return
     }
     clearTimeout(noteTimers.get(closest.note.id))
@@ -234,15 +242,14 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     const poses = laneDanceFrames[lane]
     danceFrame.value = poses[lanePoseTurns[lane] % poses.length]
     lanePoseTurns[lane] += 1
-    synthTone(perfect ? 1046.5 : 783.99, 0.12, 'triangle', 0.05)
     if (prefersReducedMotion()) return
     gsap.fromTo(`.lane-button:nth-child(${lane + 1})`, { scale: 0.9 }, { scale: 1, duration: 0.32, ease: 'back.out(2)' })
-    gsap.fromTo('.game-dancer', { y: 8, rotation: lane % 2 ? 2 : -2 }, { y: 0, rotation: 0, duration: 0.4, ease: 'back.out(2)' })
+    gsap.fromTo('.game-dancer-anchor', { y: 8, rotation: lane % 2 ? 2 : -2 }, { y: 0, rotation: 0, duration: 0.4, ease: 'back.out(2)', overwrite: true, clearProps: 'transform' })
   }
 
   function onKeydown(event) {
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return
-    const lane = ['a', 's', 'd', 'f'].indexOf(event.key.toLowerCase())
+    const lane = getRhythmLaneForKey(event.key)
     if (lane >= 0) {
       event.preventDefault()
       hitLane(lane)
@@ -280,6 +287,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     clearTimeout(completionTimer)
     clearTimeout(cryTimer)
     clearGameTimers()
+    gsap.killTweensOf('.game-dancer-anchor')
     window.removeEventListener('keydown', onKeydown)
   })
 
