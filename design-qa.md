@@ -2,7 +2,7 @@
 
 ## Comparison target
 
-- Source visual truth: `/private/var/folders/fp/bv98vn2s2v9dchl651zpsvn00000gn/T/TemporaryItems/NSIRD_screencaptureui_P6beEF/截圖 2026-09-26 晚上9.28.42.png`
+- Source visual truth: user-supplied screenshot captured on 2026-09-26 at 21:28:42.
 - Source pixels: 533 × 959.
 - Implementation evidence: Codex in-app Browser capture `iab/tab-10/rhythm-game-mobile-604x903` plus pause-state capture `iab/tab-9/rhythm-game-mobile-pause-390x844`.
 - Implementation pixels / CSS viewport: 604 × 903 at device scale 1; pause state 390 × 844 at device scale 1.
@@ -56,5 +56,78 @@ None.
 ## Follow-up polish
 
 No blocking polish remains.
+
+final result: passed
+
+---
+
+# Lunar Pop 斜角選單 Design QA
+
+## Comparison target
+
+- Source visual truth: user-supplied screenshot captured on 2026-09-28 at 00:50:30.
+- Source pixels / CSS viewport: 868 × 545 at 1×.
+- Implementation evidence: Codex in-app Browser tab 5, local `http://127.0.0.1:4176/`, captured at 868 × 545 and 390 × 844 CSS pixels at 1×.
+- State: menu open; second scene keyboard-focused to expose the yellow fill and pink slanted end-cap.
+
+## Full-view comparison evidence
+
+The supplied target calls for an angled scene selector rather than a plain list. The implementation keeps the requested dark plum, cream, yellow, and pink palette while reducing the treatment to a clear pair of matching parallelograms: the focused row fills from left to right as a yellow parallelogram and ends in a pink action panel using the same angle. Numeric and line decorations are intentionally removed.
+
+## Focused region comparison evidence
+
+- Desktop at 868 × 545: the scene list remains inside the right panel with no clipping; the selected end-cap keeps its arrow legible.
+- Mobile at 390 × 844: all three 72px rows remain fully tappable, with the parallelogram contained inside each row.
+- Interaction: keyboard focus triggers the same yellow fill and pink end-cap as hover. Browser console reported no warnings or errors.
+
+## Required fidelity surfaces
+
+- Fonts and typography: existing project DM Sans/CJK hierarchy is retained; titles and their smaller descriptive line form the only vertical type hierarchy.
+- Spacing and layout rhythm: the second row is offset farther right and the third row returns partway left, creating an intentional stagger while their right edges remain aligned.
+- Colors and visual tokens: cream-on-plum defaults, yellow selected fill, and pink angular accents map directly to the current Lunar Pop tokens.
+- Image quality and asset fidelity: existing Momo stage imagery is unchanged and stays isolated to the visual panel.
+- Copy and content: original Lunar Pop labels, destinations, and accessible button names remain intact. `SELECT YOUR MOON` is decorative scene framing.
+
+## Findings
+
+No actionable P0, P1, or P2 differences remain for the requested matching yellow and pink parallelograms.
+
+## Implementation checklist
+
+- [x] Add a single selected-state parallelogram without pointer-driven work.
+- [x] Stagger the three scene rows while preserving their right edge.
+- [x] Remove numeric and line decorations.
+- [x] Add selected-row pink slanted end-cap.
+- [x] Verify desktop reference-sized and 390px mobile layouts.
+- [x] Verify keyboard selection and console cleanliness.
+
+## Follow-up polish
+
+No blocking polish remains.
+
+final result: passed
+
+---
+
+# Lunar Pop 月兔背景 Design QA
+
+## Comparison target
+
+- Theme direction: Lunar Pop Club 月兔限定舞台；保留遊戲既有舞台與互動。
+- Source assets: `public/images/lunar-pop-stage-bg-v1.webp`, `public/images/lunar-rabbit-star-map-bg-v1.webp`, `public/images/lunar-rabbit-lantern-garden-bg-v1.webp`, and `public/images/lunar-rabbit-night-sky-footer-v1.webp`.
+- Implementation evidence: Codex in-app Browser desktop capture at 1350px wide, and mobile capture at 390 × 844.
+
+## Verified surfaces
+
+- Hero: retains the neon moon concert as the opening visual.
+- Story: uses the celestial rabbit constellation map as a distinct quiet backdrop.
+- Invitation: uses the rabbit lantern garden, with the CTA copy remaining legible at desktop and 390px widths.
+- Footer: uses the minimal moon-lake night scene.
+- Game boundary: `.rhythm-stage-bg` continues to use `momo-moon-rabbit-stage-v2.webp`; the Lunar Pop background overrides do not affect its game logic.
+- Browser console: no warnings or errors in the checked page state.
+
+## Findings
+
+No actionable visual or responsive issues found in the updated non-game surfaces.
 
 final result: passed

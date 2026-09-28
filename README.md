@@ -93,15 +93,15 @@ function replayOpening() { introOpen.value = true }
 
 ## 角色素材
 
-星乃モモ（Hoshino Momo）為 22 歲原創舞台表演者。角色使用粉色雙馬尾、星星髮夾、奶油色襯衣、粉色蝴蝶結洋裝與瑪莉珍鞋。生成提示保留於 `ASSET-PROMPT.md`。
+星乃モモ（Hoshino Momo）為 22 歲原創舞台表演者。角色使用粉色雙馬尾、星星髮夾、奶油色襯衣、粉色蝴蝶結洋裝與瑪莉珍鞋。
 
-`public/images/momo-dance-atlas.png` 是 1536 × 1024 RGBA 透明 PNG，4 欄 × 2 列，每格 384 × 512。索引 0–7 從左到右、再由上到下。`MomoSprite.vue` 以 `background-size: 400% 200%` 切換位置；多個角色實例共用同一圖檔。
+舞蹈關鍵幀使用 `public/images/momo-moon-rabbit-dance-01.webp` 至 `08.webp`；`MomoSprite.vue` 依索引 0–7 選擇對應圖片。
 
 ```vue
 <MomoSprite :frame="4" label="モモ比心" />
 ```
 
-外層設定顯示尺寸，角色維持 3:4 比例。`index.html` 預載圖集；Google Fonts 使用 M PLUS Rounded 1c／DM Sans，字型無法載入時回退系統字型。
+外層設定顯示尺寸，角色維持 3:4 比例。Google Fonts 使用 M PLUS Rounded 1c／DM Sans，字型無法載入時回退系統字型。
 
 ## 主要檔案
 

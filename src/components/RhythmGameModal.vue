@@ -14,23 +14,23 @@ const { soundOn, synthTone, enableSound, toggleSound } = useSoundtrack()
 const {
   gameActive, gamePaused, gameScore, gameCombo, gameStatus, gameProgress,
   notes, danceFrame, letterSending, currentLevel, currentLevelIndex,
-  isCrying, missCount, startGame, togglePause, hitLane,
+  isCrying, missCount, startGame, endGameEarly, togglePause, hitLane,
 } = useRhythmGame({ enableSound, synthTone, onComplete: (result) => emit('complete', result) })
 </script>
 
 <template>
   <div ref="modal" class="experience-modal game-modal" role="dialog" aria-modal="true" aria-labelledby="game-dialog-title">
-    <div class="modal-panel game-dialog">
+    <div class="modal-panel game-dialog" :class="{ 'is-paused': gamePaused }">
       <header class="rhythm-hud">
         <div class="rhythm-brand">
-          <img src="/favicon.svg" alt="" />
-          <span>HEARTBEAT DANCE</span>
-          <h2 id="game-dialog-title">接住モモ的心跳。</h2>
+          <img src="/images/lunar-pop-rabbit-mark-v1.webp" alt="" />
+          <span>MOONLIGHT DANCE</span>
+          <h2 id="game-dialog-title">接住モモ的月光節拍。</h2>
         </div>
         <div class="rhythm-progress" aria-label="三個難度關卡進度">
           <div class="rhythm-progress-line" aria-hidden="true"><i :style="{ transform: `scaleX(${gameProgress})` }"></i></div>
           <span v-for="(level, index) in rhythmLevels" :key="level.id" :class="{ active: index === currentLevelIndex, complete: index < currentLevelIndex }" :title="level.name">
-            <b>{{ index === currentLevelIndex ? '♡' : '' }}</b><small>0{{ level.id }}</small>
+            <b>{{ index === currentLevelIndex ? '☾' : '' }}</b><small>0{{ level.id }}</small>
           </span>
         </div>
         <div class="rhythm-meta">
@@ -44,6 +44,7 @@ const {
           <button v-if="gameActive" class="mobile-pause-toggle" :class="{ active: gamePaused }" :aria-label="gamePaused ? '繼續節奏遊戲' : '暫停節奏遊戲'" :aria-pressed="gamePaused" @click="togglePause">
             <span aria-hidden="true">{{ gamePaused ? '▶' : 'Ⅱ' }}</span><b>{{ gamePaused ? '繼續' : '暫停' }}</b>
           </button>
+          <button v-if="gameActive" class="mobile-end-toggle" aria-label="提早結束本輪遊戲並前往月光小卡" @click="endGameEarly"><span aria-hidden="true">↗</span><b>結束</b></button>
           <button class="rhythm-close" aria-label="關閉舞蹈遊戲" @click="close">
             <span class="rhythm-close-label">關閉</span><span class="rhythm-close-icon" aria-hidden="true">×</span>
           </button>
@@ -56,21 +57,23 @@ const {
         <div class="combo-readout"><b>{{ gameCombo }}</b><span>COMBO</span></div>
         <aside class="performer-zone">
           <Transition name="momo-miss" mode="out-in">
-            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" src="/images/momo-crying-v2.png" alt="沒有接到節拍而掉眼淚的星乃モモ" />
-            <MomoSprite v-else key="dancing" class="game-dancer" :frame="danceFrame" label="跟著節拍跳舞的星乃モモ" />
+            <img v-if="isCrying" key="crying" class="game-dancer crying-dancer" src="/images/momo-moon-rabbit-sad-v2.webp" alt="沒有接到節拍而難過的月兔モモ" />
+            <MomoSprite v-else key="dancing" class="game-dancer" :frame="danceFrame" label="跟著節拍跳舞的月兔モモ" />
           </Transition>
-          <div class="momo-stage-sign" aria-hidden="true"><b>Momo</b><span>一起跳動吧 ♡</span></div>
+          <div class="momo-stage-sign" aria-hidden="true"><b>Momo</b><span>一起跳進月光裡</span></div>
           <div v-if="gameActive" class="game-actions">
             <button @click="togglePause"><b>{{ gamePaused ? '▶' : 'Ⅱ' }}</b>{{ gamePaused ? '繼續' : '暫停' }}</button>
+            <button class="early-finish" @click="endGameEarly"><b>↗</b>結束本輪</button>
           </div>
         </aside>
 
         <section class="rhythm-playfield" aria-label="四軌節奏遊戲區">
-          <p class="stage-message" aria-hidden="true">你的<br>心跳<br>是最棒的光 ♡</p>
+          <p class="stage-message" aria-hidden="true">你的<br>節拍<br>照亮月光</p>
           <div class="mobile-stage-chip" aria-live="polite"><span>STAGE {{ currentLevel.id }} / {{ rhythmLevels.length }}</span><b>{{ currentLevel.name }} · {{ currentLevel.speedLabel }}</b></div>
+          <div class="mobile-stage-floor" aria-hidden="true"></div>
           <div class="note-highway" aria-label="節奏音符軌道">
             <div v-for="(_, lane) in danceLanes" :key="lane" class="note-lane">
-              <span v-for="note in notes.filter((item) => item.lane === lane)" :key="note.id" class="beat-note" :style="{ animationDuration: `${note.travelMs}ms` }" aria-hidden="true"><img src="/favicon.svg" alt="" /></span>
+              <span v-for="note in notes.filter((item) => item.lane === lane)" :key="note.id" class="beat-note" :style="{ animationDuration: `${note.travelMs}ms` }" aria-hidden="true"><img src="/images/lunar-pop-rabbit-mark-v1.webp" alt="" /></span>
             </div>
           </div>
           <div class="judgment-line" aria-hidden="true"></div>
@@ -103,7 +106,7 @@ const {
         </section>
 
         <div v-if="letterSending" class="letter-flight" aria-live="polite">
-          <img class="letter-character" src="/images/momo-love-letter.png" alt="抱著心形信件的星乃モモ" />
+          <img class="rabbit-character" src="/images/lunar-pop-rabbit-mark-v1.webp" alt="帶著月光祝福的月兔" />
         </div>
       </div>
       <p class="sr-only">{{ currentLevel.cue }}。可使用 A、S、D、F 鍵或點擊按鍵遊玩。目前漏拍 {{ missCount }} 次。</p>

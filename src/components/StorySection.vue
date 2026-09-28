@@ -33,7 +33,7 @@ watch(() => props.activeStory, () => {
           <div v-for="setting in currentStory.settings" :key="setting.term"><dt>{{ setting.term }}</dt><dd>{{ setting.value }}</dd></div>
         </dl>
       </div>
-      <div class="story-portrait"><img :key="currentStory.image" class="story-character" :src="currentStory.image" :alt="`${currentStory.label}：${currentStory.word}立繪`" /></div>
+      <div class="story-portrait"><img :key="currentStory.image" class="story-character" :src="currentStory.image" :alt="`${currentStory.label}：${currentStory.word}立繪`" loading="lazy" decoding="async" /></div>
       <div class="story-visual" aria-hidden="true"><span>{{ currentStory.en }}</span><b>0{{ activeStory + 1 }}</b><i>{{ currentStory.label }}</i></div>
       <nav class="story-tabs" aria-label="角色介紹段落">
         <button v-for="(item, index) in stories" :key="item.en" :class="{ active: index === activeStory }" :aria-pressed="index === activeStory" @pointerdown.stop="selectStory(index, $event)" @click="selectStory(index, $event)"><b>0{{ index + 1 }}</b><span>{{ item.en }}<small>{{ item.label }}</small></span></button>

@@ -1,11 +1,26 @@
 <script setup>
 import { computed } from 'vue'
-const props = defineProps({ frame: { type: Number, default: 0 }, label: { type: String, default: '' } })
-const position = computed(() => {
-  const frame = Math.min(7, Math.max(0, Math.floor(props.frame)))
-  return `${(frame % 4) * 100 / 3}% ${Math.floor(frame / 4) * 100}%`
+
+const danceFrames = Array.from(
+  { length: 8 },
+  (_, index) => `/images/momo-moon-rabbit-dance-${String(index + 1).padStart(2, '0')}.webp`,
+)
+
+const props = defineProps({
+  frame: { type: Number, default: 0 },
+  label: { type: String, default: '' },
 })
+
+const normalizedFrame = computed(() => Math.min(danceFrames.length - 1, Math.max(0, Math.floor(props.frame))))
+const frameSource = computed(() => danceFrames[normalizedFrame.value])
 </script>
 <template>
-  <div class="momo-sprite" :style="{ backgroundPosition: position }" :role="label ? 'img' : undefined" :aria-label="label || undefined" :aria-hidden="label ? undefined : true" :data-frame="frame"></div>
+  <img
+    class="momo-sprite"
+    :src="frameSource"
+    :alt="label || ''"
+    :aria-hidden="label ? undefined : true"
+    :data-frame="normalizedFrame"
+    draggable="false"
+  />
 </template>

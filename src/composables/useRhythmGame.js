@@ -13,7 +13,14 @@ export const danceLanes = [
   { key: 'A', label: '左拍' },
   { key: 'S', label: '拍手' },
   { key: 'D', label: '轉身' },
-  { key: 'F', label: '比心' },
+  { key: 'F', label: '揮手' },
+]
+
+const laneDanceFrames = [
+  [1, 2],
+  [3, 4],
+  [5, 6],
+  [7, 0],
 ]
 
 export function useRhythmGame({ enableSound, synthTone, onComplete }) {
@@ -43,6 +50,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
   let noteId = 0
   let spawnedNotes = 0
   let soundInitialized = false
+  let lanePoseTurns = [0, 0, 0, 0]
   const noteTimers = new Map()
 
   function clearGameTimers() {
@@ -97,6 +105,11 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     completionTimer = window.setTimeout(sendHeart, prefersReducedMotion() ? 50 : 650)
   }
 
+  function endGameEarly() {
+    if (!gameActive.value) return
+    finishGame()
+  }
+
   function scheduleFinish(delay) {
     finishRemaining = delay
     finishDueAt = Date.now() + delay
@@ -128,7 +141,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     notes.value = []
     gameScore.value = 0
     gameCombo.value = 0
-    gameStatus.value = 'PLAY!'
+    gameStatus.value = '月兔準備中'
     gameProgress.value = 0
     gameUnlocked.value = false
     letterSending.value = false
@@ -136,6 +149,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     missCount.value = 0
     currentLevelIndex.value = 0
     danceFrame.value = 0
+    lanePoseTurns = [0, 0, 0, 0]
     spawnedNotes = 0
     spawnDueAt = 0
     finishDueAt = 0
@@ -147,6 +161,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
       enableSound()
       soundInitialized = true
     }
+    gameStatus.value = 'PLAY!'
     spawnNote()
     spawnedNotes += 1
     gameProgress.value = 1 / totalRhythmNotes
@@ -201,7 +216,9 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     gameScore.value += perfect ? 100 : 60
     gameCombo.value += 1
     gameStatus.value = perfect ? 'PERFECT!' : 'GOOD!'
-    danceFrame.value = (danceFrame.value + 1 + lane) % 8
+    const poses = laneDanceFrames[lane]
+    danceFrame.value = poses[lanePoseTurns[lane] % poses.length]
+    lanePoseTurns[lane] += 1
     synthTone(perfect ? 1046.5 : 783.99, 0.12, 'triangle', 0.05)
     if (prefersReducedMotion()) return
     gsap.fromTo(`.lane-button:nth-child(${lane + 1})`, { scale: 0.9 }, { scale: 1, duration: 0.32, ease: 'back.out(2)' })
@@ -228,8 +245,8 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
         return
       }
       gsap.timeline({ onComplete: complete })
-        .fromTo('.letter-character', { y: 120, scale: 0.72, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.85, ease: 'back.out(1.4)' })
-        .to('.letter-flight', { opacity: 0, duration: 0.35, delay: 0.7 })
+        .fromTo('.rabbit-character', { y: 120, scale: 0.35, rotation: -10, opacity: 0 }, { y: 0, scale: 1, rotation: 0, opacity: 1, duration: 0.72, ease: 'back.out(1.5)' })
+        .to('.letter-flight', { opacity: 0, duration: 0.3, delay: 0.42 })
     })
   }
 
@@ -260,6 +277,7 @@ export function useRhythmGame({ enableSound, synthTone, onComplete }) {
     isCrying,
     missCount,
     startGame,
+    endGameEarly,
     togglePause,
     hitLane,
   }

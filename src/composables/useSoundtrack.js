@@ -28,12 +28,17 @@ export function useSoundtrack() {
   function startMusic() {
     ensureAudio()
     clearInterval(musicLoop)
-    const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 783.99, 1046.5]
+    musicStep = 0
+    const melody = [659.25, 783.99, 880, 783.99, 659.25, 587.33, 659.25, 783.99, 1046.5, 880, 783.99, 659.25, 587.33, 659.25, 783.99, 587.33]
+    const bass = [196, 196, 220, 220, 174.61, 174.61, 196, 196]
     musicLoop = window.setInterval(() => {
-      synthTone(melody[musicStep % melody.length], 0.16, 'triangle', 0.025)
-      if (musicStep % 2 === 0) synthTone(130.81, 0.09, 'sine', 0.018)
+      const note = melody[musicStep % melody.length]
+      synthTone(note, 0.32, 'sine', 0.018)
+      synthTone(note * 2, 0.11, 'triangle', 0.007)
+      if (musicStep % 4 === 0) synthTone(bass[Math.floor(musicStep / 2) % bass.length], 0.42, 'triangle', 0.014)
+      if (musicStep % 2 === 1) synthTone(1567.98, 0.055, 'sine', 0.004)
       musicStep += 1
-    }, 320)
+    }, 360)
   }
 
   function enableSound() {

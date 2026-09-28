@@ -1,14 +1,68 @@
 <script setup>
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import gsap from 'gsap'
 import { prefersReducedMotion } from '../composables/usePageExperience'
 import { scrollToSection } from '../composables/useSectionNavigation'
 
 const emit = defineEmits(['overlay-change'])
 const menuOpen = ref(false)
+const menuRendered = ref(false)
+const menuClosing = ref(false)
+const menuOverlay = ref(null)
+let menuTimeline
 
 function closeMenu() {
+  if (!menuOpen.value || menuClosing.value) return
+
   menuOpen.value = false
+  if (prefersReducedMotion()) {
+    menuRendered.value = false
+    emit('overlay-change', false)
+    return
+  }
+
+  menuClosing.value = true
+  menuTimeline?.kill()
+
+  const overlay = menuOverlay.value
+  if (!overlay) {
+    finishClosingMenu()
+    return
+  }
+
+  const visual = overlay.querySelector('.menu-visual')
+  const character = overlay.querySelector('.menu-character')
+  const bursts = overlay.querySelectorAll('.menu-burst')
+  const heading = overlay.querySelector('.menu-links > p')
+  const cards = overlay.querySelectorAll('.menu-links button')
+
+  menuTimeline = gsap.timeline({
+    defaults: { ease: 'power2.inOut' },
+    onComplete: finishClosingMenu,
+  })
+    .to(cards, { y: -14, opacity: 0, stagger: .045, duration: .22 })
+    .to(heading, { y: -10, opacity: 0, duration: .2 }, .04)
+    .to(bursts, { scale: .72, opacity: 0, duration: .22 }, .08)
+    .to(character, { xPercent: -5, opacity: 0, duration: .32 }, .1)
+    .to(visual, { xPercent: -4, opacity: 0, duration: .32 }, .12)
+    .to(overlay, { opacity: 0, duration: .2 }, .25)
+}
+
+function finishClosingMenu() {
+  menuClosing.value = false
+  menuRendered.value = false
+  emit('overlay-change', false)
+}
+
+function openMenu() {
+  if (menuClosing.value) return
+  menuRendered.value = true
+  menuOpen.value = true
+}
+
+function toggleMenu() {
+  if (menuOpen.value) closeMenu()
+  else openMenu()
 }
 
 function navigateTo(sectionId) {
@@ -17,31 +71,52 @@ function navigateTo(sectionId) {
 }
 
 watch(menuOpen, async (open) => {
-  emit('overlay-change', open)
-  if (!open || prefersReducedMotion()) return
+  if (!open) return
+  emit('overlay-change', true)
+  if (prefersReducedMotion()) return
+  menuTimeline?.kill()
   await nextTick()
-  gsap.timeline({ defaults: { ease: 'power3.out' } })
-    .from('.menu-character', { xPercent: -16, opacity: 0, duration: 0.75 })
-    .from('.menu-links button', { x: 50, opacity: 0, stagger: 0.08, duration: 0.52 }, '-=.48')
+  const overlay = menuOverlay.value
+  if (!overlay) return
+
+  const visual = overlay.querySelector('.menu-visual')
+  const character = overlay.querySelector('.menu-character')
+  const bursts = overlay.querySelectorAll('.menu-burst')
+  const heading = overlay.querySelector('.menu-links > p')
+  const cards = overlay.querySelectorAll('.menu-links button')
+
+  menuTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    .from(overlay, { opacity: 0, duration: .24 })
+    .from(visual, { xPercent: -5, opacity: 0, duration: .42 }, .04)
+    .from(character, { xPercent: -6, opacity: 0, duration: .46 }, .1)
+    .from(bursts, { scale: .7, opacity: 0, stagger: .08, duration: .3 }, .18)
+    .from(heading, { y: 14, opacity: 0, duration: .32 }, .16)
+    .from(cards, { y: 18, opacity: 0, stagger: .07, duration: .34 }, .24)
 })
+
+onBeforeUnmount(() => menuTimeline?.kill())
 </script>
 
 <template>
   <header class="site-header">
-    <button class="brand" type="button" @click="scrollToSection('top')"><img src="/favicon.svg" alt="" /><span>星乃モモ<small>OFFICIAL SITE</small></span></button>
-    <button class="menu-button" :aria-expanded="menuOpen" :aria-label="menuOpen ? '關閉選單' : '開啟選單'" @click="menuOpen = !menuOpen">
+    <button class="brand" type="button" @click="scrollToSection('top')"><img src="/images/lunar-pop-rabbit-mark-v1-small.webp" alt="" /><span>星乃モモ<small>LUNAR POP CLUB</small></span></button>
+    <button class="menu-button" :aria-expanded="menuOpen" :aria-label="menuOpen ? '關閉選單' : '開啟選單'" @click="toggleMenu">
       <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="menu-label">{{ menuOpen ? '關閉' : '選單' }}</span>
     </button>
   </header>
 
-  <div v-if="menuOpen" class="menu-overlay" role="dialog" aria-modal="true" aria-label="網站選單">
-    <div class="menu-visual"><img class="menu-character" src="/images/momo-standing-v2.png" alt="星乃モモ全身形象" /><span>WELCOME TO<br>MOMO'S WORLD</span></div>
+  <div v-if="menuRendered" ref="menuOverlay" class="menu-overlay" role="dialog" aria-modal="true" aria-label="網站選單">
+    <div class="menu-visual">
+      <span class="menu-burst menu-burst--top" aria-hidden="true">✦</span>
+      <img class="menu-character" src="/images/momo-moon-rabbit-hero-v2.webp" alt="月兔裝扮的星乃モモ" />
+      <span class="menu-visual-copy">WELCOME TO<br>LUNAR POP CLUB</span>
+    </div>
     <nav class="menu-links" aria-label="主要導覽">
-      <p>目錄 / MENU</p>
-      <button type="button" @click="navigateTo('top')"><b>01</b><span>首頁<small>被可愛接住的地方</small></span></button>
-      <button type="button" @click="navigateTo('story')"><b>02</b><span>關於モモ<small>再靠近一點點吧</small></span></button>
-      <button type="button" @click="navigateTo('dance')"><b>03</b><span>心動小遊戲<small>陪我跳完這一首</small></span></button>
+      <p>MOONLIGHT MENU</p>
+      <button type="button" @click="navigateTo('top')"><span>月下開演<small>跟著月光走進舞台</small></span><i aria-hidden="true">↗</i></button>
+      <button type="button" @click="navigateTo('story')"><span>月兔檔案<small>認識今晚的 Momo</small></span><i aria-hidden="true">↗</i></button>
+      <button type="button" @click="navigateTo('dance')"><span>月下共舞<small>陪我跳完這一首</small></span><i aria-hidden="true">↗</i></button>
     </nav>
   </div>
 </template>
