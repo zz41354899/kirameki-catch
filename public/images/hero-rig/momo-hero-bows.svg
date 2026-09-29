@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <g id="bows">
+      <path d="M268 91C315 61 365 76 402 118L432 184C403 235 353 267 300 244C259 226 245 176 268 91Z"/><path d="M620 74C675 50 735 78 769 127C796 167 781 225 736 253C690 282 642 248 612 207C586 170 584 105 620 74Z"/><path d="M410 466C476 422 554 437 584 487C619 437 699 445 729 498C751 537 714 590 653 611L620 750L548 672L473 738L464 608C403 586 371 517 410 466Z"/><path d="M233 624C290 585 353 599 397 640C425 668 406 720 360 748L296 821L261 755L181 779C172 720 190 653 233 624Z"/><path d="M690 639C744 603 809 616 849 663C880 700 853 748 806 770L769 841L715 776L651 796C640 735 652 665 690 639Z"/><path d="M62 697C123 652 204 669 244 720C273 758 252 813 211 839L187 979L128 894L75 1002L24 947L50 830C8 792 18 730 62 697Z"/><path d="M801 756C855 716 926 740 959 794C982 831 959 876 923 899L906 1048L849 955L793 1082L748 1021L771 891C730 850 757 789 801 756Z"/><path d="M297 910C336 879 385 891 414 925C437 952 420 994 383 1010L335 1055L300 1011L258 1035C252 986 266 935 297 910Z"/><path d="M421 1214C463 1180 522 1193 556 1233C581 1263 561 1305 524 1321L482 1362L444 1323L398 1343C392 1296 399 1235 421 1214Z"/>
+    </g>
+    <mask id="bows-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536">
+      <use href="#bows" fill="white"/>
+      <ellipse cx="371" cy="212" rx="23" ry="30" fill="black"/><ellipse cx="719" cy="186" rx="23" ry="30" fill="black"/><ellipse cx="752" cy="245" rx="20" ry="28" fill="black"/>
+      <ellipse cx="583" cy="688" rx="31" ry="64" fill="black"/><circle cx="585" cy="548" r="29" fill="black"/><circle cx="198" cy="726" r="25" fill="black"/><circle cx="878" cy="790" r="25" fill="black"/><circle cx="337" cy="996" r="25" fill="black"/><circle cx="476" cy="1312" r="24" fill="black"/>
+      <circle cx="474" cy="543" r="42" fill="black"/><circle cx="637" cy="568" r="41" fill="black"/><circle cx="583" cy="624" r="30" fill="black"/><circle cx="394" cy="625" r="34" fill="black"/><circle cx="712" cy="647" r="34" fill="black"/><circle cx="154" cy="742" r="49" fill="black"/><circle cx="172" cy="1064" r="51" fill="black"/><circle cx="891" cy="833" r="48" fill="black"/><circle cx="872" cy="1123" r="50" fill="black"/><circle cx="371" cy="1072" r="52" fill="black"/><circle cx="510" cy="1424" r="48" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1536" fill="white" mask="url(#bows-mask)"/>
+</svg>

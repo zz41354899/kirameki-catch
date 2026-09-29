@@ -1,7 +1,9 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { gsap } from 'gsap'
 import { scrollToSection } from '../composables/useSectionNavigation'
+import MomoPuppet from './MomoPuppet.vue'
+import { createMomoGesture } from '../lib/momoGesture.js'
 
 const reactions = {
   default: {
@@ -35,10 +37,14 @@ const activeReaction = ref('default')
 const reactionToken = ref(0)
 const playedReactionToken = ref(-1)
 const baseArt = ref(null)
+const puppetRig = ref(null)
 const reactionArt = ref(null)
+const rigReady = ref(false)
 const reaction = computed(() => reactions[activeReaction.value])
 let resetReactionTimer
 let reactionTimeline
+let rigContext
+const gesture = createMomoGesture()
 
 function motionIsReduced() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -112,12 +118,68 @@ function chooseReaction(name) {
 }
 
 function releasePointerFocus(event) {
-  requestAnimationFrame(() => event.currentTarget?.blur())
+  const target = event.currentTarget
+  requestAnimationFrame(() => target?.blur())
 }
+
+function moveRig(event) {
+  if (!baseArt.value || motionIsReduced()) return
+  const point = gesture.move(event, event.currentTarget.getBoundingClientRect())
+  if (!point) return
+  if (point.capture && !event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.setPointerCapture(event.pointerId)
+  puppetRig.value?.setPointer(point.x, point.y)
+}
+
+function startRigGesture(event) {
+  if (!motionIsReduced() && gesture.start(event)) moveRig(event)
+}
+
+function endRigGesture(event) {
+  if (!gesture.end(event)) return
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+  resetRig()
+}
+
+function leaveRig() {
+  if (!gesture.active) resetRig()
+}
+
+function guardGestureClick(event) {
+  if (!gesture.blocksClick(event)) return
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+function resetRig() {
+  if (!baseArt.value || motionIsReduced()) return
+  puppetRig.value?.reset()
+}
+
+function triggerRigMotion() {
+  if (!motionIsReduced()) puppetRig.value?.wave()
+}
+
+onMounted(() => {
+  if (!baseArt.value) return
+  if (motionIsReduced()) return
+
+  rigContext = gsap.context(() => {
+    gsap.to(baseArt.value, {
+      y: -2,
+      scaleY: 1.006,
+      duration: 2.25,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      transformOrigin: '50% 78%',
+    })
+  }, baseArt.value)
+})
 
 onBeforeUnmount(() => {
   window.clearTimeout(resetReactionTimer)
   reactionTimeline?.kill()
+  rigContext?.revert()
 })
 </script>
 
@@ -143,15 +205,17 @@ onBeforeUnmount(() => {
       <p class="hero-intro">戴上兔耳，跟著節拍跳進月亮裡。<br>モモ會把每一次心跳，都變成今夜的光。</p>
     </div>
     <div class="hero-character-stage">
-      <div class="hero-character" :class="`hero-character--${activeReaction}`" role="group" aria-label="可互動的月兔モモ">
-        <img ref="baseArt" class="hero-character-art" src="/images/momo-moon-rabbit-hero-v2.webp" :alt="activeReaction === 'default' ? reaction.alt : ''" fetchpriority="high" draggable="false" />
+      <div class="hero-character" :class="[`hero-character--${activeReaction}`, { 'is-rig-ready': rigReady }]" role="group" aria-label="可互動的月兔モモ" @pointerdown="startRigGesture" @pointermove="moveRig" @pointerup="endRigGesture" @pointercancel="endRigGesture" @lostpointercapture="endRigGesture" @pointerleave="leaveRig" @click.capture="guardGestureClick" @click="triggerRigMotion">
+        <div ref="baseArt" class="hero-character-art hero-character-rig">
+          <MomoPuppet ref="puppetRig" :alt="activeReaction === 'default' ? reaction.alt : ''" @ready="rigReady = true" />
+        </div>
         <img v-if="activeReaction !== 'default'" ref="reactionArt" :key="`${activeReaction}-${reactionToken}`" class="hero-character-reaction" :src="reaction.image" :alt="reaction.alt" draggable="false" @load="playReactionMotion" />
         <button class="hero-hotspot hero-hotspot--head" type="button" aria-label="摸摸モモ的頭，看看她高興的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('happy')" />
         <button class="hero-hotspot hero-hotspot--middle" type="button" aria-label="點擊モモ的中間，看看她生氣的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('angry')" />
         <button class="hero-hotspot hero-hotspot--thigh" type="button" aria-label="點擊モモ的大腿，看看她嚇到的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('startled')" />
         <button class="hero-hotspot hero-hotspot--feet" type="button" aria-label="點擊モモ的腳，看看她疑惑的反應" @pointerup="releasePointerFocus" @click.stop="chooseReaction('confused')" />
         <div v-if="activeReaction !== 'default'" :key="`${activeReaction}-sparkles`" class="hero-reaction-sparkles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></div>
-        <p :key="activeReaction" class="hero-reaction" aria-live="polite">{{ reaction.message }}</p>
+        <p :key="activeReaction" class="hero-reaction" aria-live="polite"><template v-if="rigReady && activeReaction === 'default'"><span class="hero-hint-pointer">控制滑鼠與モモ互動。</span><span class="hero-hint-touch">移動手指與モモ互動，輕點看反應。</span></template><template v-else>{{ reaction.message }}</template></p>
       </div>
     </div>
     <button class="hero-scroll-cue" type="button" @click="scrollToSection('story')"><span>ENTER THE STAGE</span><b>↓</b></button>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <path id="ear" d="M190 219C202 165 242 95 305 52C360 15 420 30 463 80C490 112 505 151 485 185C465 218 420 226 382 233C318 244 248 239 207 227Z"/>
+    <mask id="ear-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536">
+      <use href="#ear" fill="white"/>
+      <path fill="black" d="M268 91C315 61 365 76 402 118L432 184C403 235 353 267 300 244C259 226 245 176 268 91Z"/>
+      <ellipse cx="371" cy="212" rx="23" ry="30" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1536" fill="white" mask="url(#ear-mask)"/>
+</svg>

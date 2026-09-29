@@ -106,7 +106,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .hero-intro { position: relative; max-width: 410px; margin: 34px 0 0 2px; color: #543244cc; font-size: 13px; font-weight: 700; line-height: 1.9; letter-spacing: .03em; }
 .hero-character-stage { position: absolute; z-index: 3; left: -2%; bottom: -10%; width: min(55vw, 790px); height: 105%; transform-origin: center 65%; will-change: transform, opacity; }
 .hero-character { position: relative; width: 100%; height: 100%; filter: drop-shadow(0 18px 16px #87364f24); transform-origin: center 65%; }
-.hero-character-art { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transform-origin: center 70%; pointer-events: none; user-select: none; -webkit-user-drag: none; touch-action: pan-y; }
+.hero-character-art { display: block; width: 100%; height: 100%; transform-origin: center 70%; pointer-events: none; user-select: none; touch-action: pan-y; }
+.hero-character-rig { position: absolute; right: 0; bottom: 0; left: 0; width: auto; max-width: 100%; aspect-ratio: 2 / 3; margin-inline: auto; overflow: visible; will-change: transform, opacity; }
 .hero-character-reaction { position: absolute; z-index: 1; right: 0; bottom: 0; left: 0; display: block; width: 100%; height: 86%; object-fit: contain; object-position: center bottom; opacity: 0; transform-origin: center 70%; pointer-events: none; user-select: none; -webkit-user-drag: none; touch-action: pan-y; will-change: opacity, transform; }
 .hero-hotspot { position: absolute; z-index: 2; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: pan-y; }
 .hero-hotspot--head { top: 4%; left: 31%; width: 38%; height: 22%; }
@@ -120,6 +121,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .hero-reaction-sparkles i:nth-child(1) { left: 8%; top: 8%; animation-delay: .02s; }
 .hero-reaction-sparkles i:nth-child(2) { right: 12%; top: 33%; font-size: clamp(12px, 1.5vw, 23px); animation-delay: .11s; }
 .hero-reaction-sparkles i:nth-child(3) { left: 38%; bottom: 10%; font-size: clamp(11px, 1.25vw, 18px); animation-delay: .18s; }
+.hero-character.is-rig-ready { cursor: pointer; }
+.hero-character, .hero-hotspot { touch-action: pan-y pinch-zoom; }
+.hero-hint-touch { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .hero-hint-pointer { display: none; }
+  .hero-hint-touch { display: inline; }
+}
+/* Keep the rig's transparent overscan visible after initialization as well.
+   A ready-only overflow:hidden here clips ears/hair at the old image bounds. */
 @keyframes heroReactionNote { from { opacity: 0; transform: translate3d(-10px, 8px, 0) scale(.88); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
 @keyframes heroReactionSpark { 0% { opacity: 0; transform: translate3d(0, 15px, 0) scale(.3) rotate(-15deg); } 35% { opacity: 1; } 100% { opacity: 0; transform: translate3d(0, -36px, 0) scale(1.25) rotate(18deg); } }
 .hero-scroll-cue { position: absolute; z-index: 5; right: 24%; bottom: 8%; display: flex; align-items: center; gap: 14px; padding: 0; visibility: visible; opacity: 1; background: transparent; font: 800 9px 'DM Sans', sans-serif; letter-spacing: .16em; will-change: transform; }
@@ -975,6 +985,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .lunar-pop .hero-section { background: #100713 url('/images/lunar-pop-stage-bg-v1.webp') center/cover; }
   .lunar-pop .hero-stage-loop { display: none; }
   .hero-character-stage { will-change: auto; }
+  .hero-character-rig { will-change: auto; }
   .lunar-pop .menu-character,
   .menu-overlay-enter-active,
   .menu-overlay-leave-active,
@@ -1144,6 +1155,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .lunar-pop .hero-intro { display: block; max-width: 295px; margin-top: 24px; font-size: 12px; line-height: 2; }
   .lunar-pop .hero-intro::before { display: none; }
   .lunar-pop .hero-character-stage { left: -18%; bottom: -2%; width: 118vw; height: 66%; }
+  .hero-character-rig { right: auto; margin-inline: 0; }
   .hero-rabbit-mark--left { top: 48%; left: 8%; }
   .hero-rabbit-mark--right { right: 8%; bottom: 12%; }
   .lunar-pop .hero-scroll-cue { right: 7%; bottom: 5%; }

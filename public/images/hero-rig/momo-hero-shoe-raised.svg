@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <mask id="part" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536">
+      <path fill="white" d="M302 942C330 915 386 913 423 942C456 969 469 1022 455 1074C441 1128 410 1183 365 1200C322 1216 282 1185 278 1137C274 1089 294 1055 302 1024C309 996 281 968 302 942Z"/>
+      <path fill="black" d="M297 910C336 879 385 891 414 925C437 952 420 994 383 1010L335 1055L300 1011L258 1035C252 986 266 935 297 910Z"/>
+      <circle cx="371" cy="1072" r="52" fill="black"/>
+      <circle cx="337" cy="996" r="25" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1536" fill="white" mask="url(#part)"/>
+</svg>

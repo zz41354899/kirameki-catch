@@ -1,0 +1,267 @@
+{
+  "version": 12,
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "source": "/images/momo-moon-rabbit-hero-v2.webp",
+  "master": "/images/momo-rig-hybrid/master.png",
+  "jointOverlapPixels": 32,
+  "masterInteriorInset": 14,
+  "gapGuardPixels": 22187,
+  "softenedRibbonPixels": 12211,
+  "parts": [
+    {
+      "id": "ear-left",
+      "group": "ear-left",
+      "visible": "/images/momo-rig-hybrid/ear-left.png",
+      "underlay": "/images/momo-rig-hybrid/ear-left-underlay.png",
+      "root": [
+        0.39,
+        0.14
+      ],
+      "tip": [
+        0.27,
+        0.04
+      ],
+      "x": 207,
+      "y": 32,
+      "width": 288,
+      "height": 232
+    },
+    {
+      "id": "ear-right",
+      "group": "ear-right",
+      "visible": "/images/momo-rig-hybrid/ear-right.png",
+      "underlay": "/images/momo-rig-hybrid/ear-right-underlay.png",
+      "root": [
+        0.62,
+        0.13
+      ],
+      "tip": [
+        0.71,
+        0.04
+      ],
+      "x": 558,
+      "y": 2,
+      "width": 232,
+      "height": 225
+    },
+    {
+      "id": "hair-left-outermost",
+      "group": "hair-left-outermost",
+      "visible": "/images/momo-rig-hybrid/hair-left-outermost.png",
+      "underlay": "/images/momo-rig-hybrid/hair-left-outermost-underlay.png",
+      "root": [
+        0.37,
+        0.25
+      ],
+      "tip": [
+        0.05,
+        0.58
+      ],
+      "sway": 1.25,
+      "phase": 0.2,
+      "x": 1,
+      "y": 376,
+      "width": 104,
+      "height": 316
+    },
+    {
+      "id": "hair-left-outer",
+      "group": "hair-left-outer",
+      "visible": "/images/momo-rig-hybrid/hair-left-outer.png",
+      "underlay": "/images/momo-rig-hybrid/hair-left-outer-underlay.png",
+      "root": [
+        0.37,
+        0.25
+      ],
+      "tip": [
+        0.15,
+        0.61
+      ],
+      "sway": 1.1,
+      "phase": 1.1,
+      "x": 105,
+      "y": 265,
+      "width": 95,
+      "height": 681
+    },
+    {
+      "id": "hair-left-middle",
+      "group": "hair-left-middle",
+      "visible": "/images/momo-rig-hybrid/hair-left-middle.png",
+      "underlay": "/images/momo-rig-hybrid/hair-left-middle-underlay.png",
+      "root": [
+        0.38,
+        0.25
+      ],
+      "tip": [
+        0.24,
+        0.63
+      ],
+      "sway": 0.93,
+      "phase": 2,
+      "x": 200,
+      "y": 236,
+      "width": 90,
+      "height": 736
+    },
+    {
+      "id": "hair-left-inner",
+      "group": "hair-left-inner",
+      "visible": "/images/momo-rig-hybrid/hair-left-inner.png",
+      "underlay": "/images/momo-rig-hybrid/hair-left-inner-underlay.png",
+      "root": [
+        0.4,
+        0.25
+      ],
+      "tip": [
+        0.34,
+        0.6
+      ],
+      "sway": 0.74,
+      "phase": 2.9,
+      "x": 290,
+      "y": 238,
+      "width": 88,
+      "height": 100
+    },
+    {
+      "id": "hair-right-inner",
+      "group": "hair-right-inner",
+      "visible": "/images/momo-rig-hybrid/hair-right-inner.png",
+      "underlay": "/images/momo-rig-hybrid/hair-right-inner-underlay.png",
+      "root": [
+        0.62,
+        0.24
+      ],
+      "tip": [
+        0.68,
+        0.6
+      ],
+      "sway": 0.74,
+      "phase": 3.5,
+      "x": 658,
+      "y": 254,
+      "width": 87,
+      "height": 712
+    },
+    {
+      "id": "hair-right-middle",
+      "group": "hair-right-middle",
+      "visible": "/images/momo-rig-hybrid/hair-right-middle.png",
+      "underlay": "/images/momo-rig-hybrid/hair-right-middle-underlay.png",
+      "root": [
+        0.64,
+        0.24
+      ],
+      "tip": [
+        0.76,
+        0.63
+      ],
+      "sway": 0.93,
+      "phase": 4.4,
+      "x": 745,
+      "y": 211,
+      "width": 90,
+      "height": 731
+    },
+    {
+      "id": "hair-right-outer",
+      "group": "hair-right-outer",
+      "visible": "/images/momo-rig-hybrid/hair-right-outer.png",
+      "underlay": "/images/momo-rig-hybrid/hair-right-outer-underlay.png",
+      "root": [
+        0.65,
+        0.24
+      ],
+      "tip": [
+        0.86,
+        0.61
+      ],
+      "sway": 1.1,
+      "phase": 5.3,
+      "x": 835,
+      "y": 300,
+      "width": 90,
+      "height": 458
+    },
+    {
+      "id": "hair-right-outermost",
+      "group": "hair-right-outermost",
+      "visible": "/images/momo-rig-hybrid/hair-right-outermost.png",
+      "underlay": "/images/momo-rig-hybrid/hair-right-outermost-underlay.png",
+      "root": [
+        0.65,
+        0.24
+      ],
+      "tip": [
+        0.96,
+        0.58
+      ],
+      "sway": 1.25,
+      "phase": 6.2,
+      "x": 925,
+      "y": 367,
+      "width": 86,
+      "height": 423
+    },
+    {
+      "id": "hand-front",
+      "group": "hand-front",
+      "visible": "/images/momo-rig-hybrid/hand-front.png",
+      "underlay": "/images/momo-rig-hybrid/hand-front-underlay.png",
+      "root": [
+        0.39,
+        0.35
+      ],
+      "tip": [
+        0.2,
+        0.3
+      ],
+      "x": 150,
+      "y": 309,
+      "width": 296,
+      "height": 293
+    },
+    {
+      "id": "hand-side",
+      "group": "hand-side",
+      "visible": "/images/momo-rig-hybrid/hand-side.png",
+      "underlay": "/images/momo-rig-hybrid/hand-side-underlay.png",
+      "root": [
+        0.79,
+        0.36
+      ],
+      "tip": [
+        0.95,
+        0.36
+      ],
+      "x": 758,
+      "y": 452,
+      "width": 257,
+      "height": 183
+    },
+    {
+      "id": "bells",
+      "group": "bells",
+      "visible": "/images/momo-rig-hybrid/bells.png",
+      "underlay": "/images/momo-rig-hybrid/bells-underlay.png",
+      "x": 149,
+      "y": 125,
+      "width": 777,
+      "height": 1211
+    },
+    {
+      "id": "pompoms",
+      "group": "pompoms",
+      "visible": "/images/momo-rig-hybrid/pompoms.png",
+      "underlay": "/images/momo-rig-hybrid/pompoms-underlay.png",
+      "x": 102,
+      "y": 469,
+      "width": 840,
+      "height": 1003
+    }
+  ]
+}

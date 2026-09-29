@@ -1,0 +1,15 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "source": "public/images/momo-moon-rabbit-hero-v2.webp",
+  "generatedAt": "2026-09-29T08:25:58.461Z",
+  "subjectPixels": 850164,
+  "uncoveredPixels": 0,
+  "uncoveredPercent": 0,
+  "overlapPixels": 0,
+  "overlapPercent": 0,
+  "maximumCoverage": 1,
+  "note": "This measures the current front-view masks only. It does not prove that hidden pixels needed for head turns or arm swings exist."
+}

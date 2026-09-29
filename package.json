@@ -8,16 +8,23 @@
     "build": "nuxt build",
     "preview": "nuxt preview --host 127.0.0.1",
     "generate": "nuxt generate",
-    "test": "node --test src/game.test.js"
+    "build:momo-psd": "node scripts/build-momo-psd.mjs",
+    "build:momo-rig": "node scripts/build-momo-hybrid-rig.mjs",
+    "test": "node --test src/game.test.js src/momoRig.test.js"
   },
   "dependencies": {
     "gsap": "^3.13.0",
     "nuxt": "^4.4.5",
     "vue": "^3.5.0"
   },
+  "overrides": {
+    "gh-pages": "^6.3.0"
+  },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
     "@vitejs/plugin-vue": "^6.0.0",
+    "ag-psd": "^31.0.2",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.1.0",
     "vite": "^7.1.0"
   }

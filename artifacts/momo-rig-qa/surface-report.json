@@ -1,0 +1,17 @@
+{
+  "renderer": "shared-surface-v4",
+  "source": "public/images/momo-moon-rabbit-hero-v2.webp",
+  "sourceSha256": "5b84b60034748a50efa3ba8103e6ce267de38f180e1cfdf43c45a40f7eca4475",
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "vertices": 6305,
+  "triangles": 12288,
+  "pins": 114,
+  "accessoryZones": 9,
+  "hairPins": 72,
+  "hairZones": 24,
+  "texturePasses": 1,
+  "generatedTextureLayers": 0
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <path id="face" d="M379 237C403 192 452 161 522 160C600 158 660 194 684 247C711 308 692 379 637 421C588 460 513 468 451 439C395 413 363 358 365 302C366 276 369 255 379 237Z"/>
+    <mask id="face-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536">
+      <use href="#face" fill="white"/>
+      <ellipse cx="466" cy="310" rx="61" ry="58" fill="black"/>
+      <ellipse cx="598" cy="298" rx="65" ry="47" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1536" fill="white" mask="url(#face-mask)"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <path id="ear" d="M558 139C558 79 584 19 633 4C687-12 751 13 793 56C835 99 855 145 823 174C795 201 739 211 692 213C635 214 580 192 563 154Z"/>
+    <mask id="ear-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536">
+      <use href="#ear" fill="white"/>
+      <path fill="black" d="M620 74C675 50 735 78 769 127C796 167 781 225 736 253C690 282 642 248 612 207C586 170 584 105 620 74Z"/>
+      <ellipse cx="719" cy="186" rx="23" ry="30" fill="black"/>
+      <ellipse cx="752" cy="245" rx="20" ry="28" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1536" fill="white" mask="url(#ear-mask)"/>
+</svg>
