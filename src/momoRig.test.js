@@ -5,9 +5,55 @@ import { createMomoSimulation, constrainSharedSurface } from './lib/momoRig.js'
 import { createHairDynamics } from './lib/momoHair.js'
 import { createAccessoryDynamics } from './lib/momoAccessories.js'
 import { createMomoGesture } from './lib/momoGesture.js'
+import { sampleMomoSway, applyMomoSway } from './lib/momoSway.js'
 import { MOMO_CANVAS_PADDING, toMomoCanvas, momoBufferSize } from './lib/momoViewport.js'
 
 const fullSurface = (rig) => rig.buildContinuousMesh(undefined, 64, 96)
+
+test('whole-character sway preserves proportions and has frame-rate independent timing', () => {
+  const distance = (a, b) => Math.hypot(a.x - b.x, (a.y - b.y) * 1.5)
+  const a = { x: .3, y: .2 }, b = { x: .7, y: .8 }
+  for (let time = 0; time < 30000; time += 100) {
+    const sway = sampleMomoSway(time)
+    assert.ok(Math.abs(sway.rotation) <= .044)
+    assert.ok(Math.abs(distance(applyMomoSway(a.x, a.y, sway), applyMomoSway(b.x, b.y, sway)) - distance(a, b)) < 1e-12)
+  }
+  const poses = [30, 60, 120].map((fps) => {
+    const rig = createMomoSimulation()
+    for (let frame = 1; frame <= fps * 5; frame += 1) rig.updatePins(frame * 1000 / fps, 1000 / fps)
+    return rig.sway.rotation
+  })
+  assert.ok(Math.max(...poses) - Math.min(...poses) < 1e-12)
+  const rig = createMomoSimulation()
+  rig.updatePins(2000, 2000)
+  assert.equal(rig.sway.rotation, sampleMomoSway(50).rotation, 'suspended tab jumps ahead')
+})
+
+test('idle sway remains visible without pointer input and stays within the shared safe surface', () => {
+  const rig = createMomoSimulation()
+  const surface = fullSurface(rig)
+  const head = (18 * 65 + 33) * 2
+  let left = Infinity, right = -Infinity, minimum = Infinity, hairTravel = 0, bottom = -Infinity, top = Infinity
+  for (let frame = 1; frame <= 840; frame += 1) {
+    rig.updatePins(frame * 1000 / 60, 1000 / 60)
+    const diagnostics = rig.updateVertices(surface, frame * 1000 / 60)
+    assert.equal(diagnostics.motionScale, 1, 'idle motion hits the fold limiter')
+    minimum = Math.min(minimum, minimumAreaRatio(surface))
+    assert.ok(surface.positions.every((value) => toMomoCanvas(value) >= 0 && toMomoCanvas(value) <= 1))
+    left = Math.min(left, surface.positions[head])
+    right = Math.max(right, surface.positions[head])
+    top = Math.min(top, rig.sway.y)
+    bottom = Math.max(bottom, rig.sway.y)
+    hairTravel = Math.max(hairTravel, ...rig.hair.pins.map((pin) => Math.abs(pin.dx)))
+  }
+  assert.ok((right - left) * 1024 > 80, 'idle head sway is too subtle')
+  assert.ok((bottom - top) * 1536 > 25, 'idle floating is too subtle')
+  assert.ok(hairTravel > .001, 'secondary hair motion is inactive')
+  assert.ok(minimum > .5, 'idle mesh is excessively distorted')
+  assert.equal(rig.parameters.lookX, 0)
+  assert.equal(rig.parameters.bodyX, 0)
+  console.log(JSON.stringify({ idleFrames: 840, headSpanPixels: (right - left) * 1024, floatSpanPixels: (bottom - top) * 1536, minimumAreaRatio: minimum }))
+})
 
 function minimumAreaRatio(surface) {
   let minimum = Infinity

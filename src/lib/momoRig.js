@@ -1,5 +1,6 @@
 import { createHairDynamics } from './momoHair.js'
 import { createAccessoryDynamics } from './momoAccessories.js'
+import { sampleMomoSway, applyMomoSway } from './momoSway.js'
 
 export function createMomoSimulation() {
   const parameters = { lookX: 0, lookY: 0, bodyX: 0, wave: 0 }
@@ -8,6 +9,8 @@ export function createMomoSimulation() {
   const textureSize = { width: 1024, height: 1536 }
   const hair = createHairDynamics()
   const accessories = createAccessoryDynamics()
+  let swayTime = 0
+  let sway = sampleMomoSway(0)
 
   const pinSpecs = [
     { name: 'waist', type: 'fixed', x: .51, y: .52, radius: .24 },
@@ -176,7 +179,11 @@ export function createMomoSimulation() {
 
   function updatePins(time, deltaTime) {
     updateParameters()
-    hair.update(time, deltaTime, parameters.lookX, velocity.lookX)
+    // Advance only while rendered; tab suspension must not jump to a new pose.
+    swayTime += clamp(Number.isFinite(deltaTime) ? deltaTime : 0, 0, 50)
+    sway = sampleMomoSway(swayTime)
+    const followVelocity = clamp(velocity.lookX + sway.followVelocity, -2.4, 2.4)
+    hair.update(time, deltaTime, parameters.lookX, followVelocity)
     if (waveStartedAt >= 0) {
       parameters.wave = Math.min(1, (time - waveStartedAt) / 1150)
       if (parameters.wave >= 1) {
@@ -184,7 +191,7 @@ export function createMomoSimulation() {
         parameters.wave = 0
       }
     }
-    accessories.update(time, deltaTime, velocity.lookX, parameters.wave)
+    accessories.update(time, deltaTime, followVelocity, parameters.wave)
     const frameScale = clamp(deltaTime / 16.67, .5, 2)
     for (const pin of pins) {
       const target = pinTarget(pin, time)
@@ -335,13 +342,14 @@ export function createMomoSimulation() {
       const point = neutral ? { x, y } : basePoint(x, y, surface.weights.subarray(weightOffset, weightOffset + pins.length))
       const flow = neutral ? { x: 0, y: 0 } : hair.displacement(surface.hairBinding, vertex)
       const secondary = neutral ? { x: 0, y: 0 } : accessories.displacement(surface.accessoryBinding, vertex, x, y)
-      surface.positions[offset] = point.x + flow.x + secondary.x
-      surface.positions[offset + 1] = point.y + flow.y + secondary.y
+      const posed = neutral ? point : applyMomoSway(point.x + flow.x + secondary.x, point.y + flow.y + secondary.y, sway)
+      surface.positions[offset] = posed.x
+      surface.positions[offset + 1] = posed.y
     }
     return constrainSharedSurface(surface)
   }
 
-  return { pins, hair, accessories, parameters, velocity, textureSize, setPointer, setParameter, reset, wave, updatePins, buildContinuousMesh, updateVertices }
+  return { pins, hair, accessories, parameters, velocity, textureSize, get sway() { return sway }, setPointer, setParameter, reset, wave, updatePins, buildContinuousMesh, updateVertices }
 }
 
 // Bound the displacement gradient over EVERY triangle, rather than only clamping

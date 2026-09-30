@@ -1,5 +1,5 @@
 {
-  "renderer": "shared-surface-v4",
+  "renderer": "shared-surface-v7",
   "source": "public/images/momo-moon-rabbit-hero-v2.webp",
   "sourceSha256": "5b84b60034748a50efa3ba8103e6ce267de38f180e1cfdf43c45a40f7eca4475",
   "canvas": {

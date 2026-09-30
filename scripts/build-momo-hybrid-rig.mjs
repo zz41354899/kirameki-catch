@@ -20,7 +20,7 @@ if (!surface.positions.every((value, i) => value === surface.rest[i])) {
   throw new Error('Neutral pose must exactly preserve the original texture')
 }
 const report = {
-  renderer: 'shared-surface-v4',
+  renderer: 'shared-surface-v7',
   source,
   sourceSha256: createHash('sha256').update(bytes).digest('hex'),
   canvas: rig.textureSize,

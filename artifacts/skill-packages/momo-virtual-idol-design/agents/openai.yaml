@@ -1,0 +1,4 @@
+interface:
+  display_name: "Momo 虛擬偶像設計"
+  short_description: "從 Momo 案例建立原創虛擬偶像的角色、視覺與互動體驗，搭配課程練習"
+  default_prompt: "請使用 $momo-virtual-idol-design，幫我把虛擬偶像想法整理成角色設定、視覺規則與第一個互動原型。"

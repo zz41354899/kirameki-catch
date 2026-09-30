@@ -1,0 +1,4 @@
+interface:
+  display_name: "Idol Bloom｜偶像萌芽"
+  short_description: "帶零基礎學員先建立虛擬偶像角色與立繪，再依角色設計場景，可分階段或整組生圖"
+  default_prompt: "請使用 $idol-bloom，我不會設計，也還沒有角色想法，請用具體範例先做可修改的角色提案，背景等角色建立後再討論。"

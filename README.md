@@ -7,6 +7,8 @@ Nuxt + Vue 3 + GSAP 的原創角色互動網站，以繁體中文為主。延續
 - [完整課程教材](./COURSE.md)：整合 Vue、GSAP、Codex、IA、Design System、Reference、Prompt 與實作練習。
 - [課程案例規劃](./COURSE-CASE-PLAN.md)：教師備課流程、學員產出與案例拆解。
 - [Codex 專案提示詞](./CODEX-PROMPT.md)：專案 Context、設計規則、動畫限制與驗證條件。
+- [Idol Bloom｜偶像萌芽 skill](./skills/idol-bloom/SKILL.md)：把角色定位、視覺、素材與互動經驗帶到學員自己的原創角色；[使用與練習](./COURSE.md#延伸練習用-idol-bloom-設計自己的虛擬偶像)。
+- [下載 Idol Bloom 完整 skill](./artifacts/skill-packages/idol-bloom.zip)：先建立角色與立繪，再依需求設計場景，可分階段或整組生圖；Momo 案例另附 GitHub 查核連結。
 - [線上成果](https://kirameki-catch.vercel.app/)：上課時先觀察完成畫面，再回到原始碼分析。
 - [GitHub 原始碼](https://github.com/zz41354899/kirameki-catch)：對照 Vue 元件、GSAP 動畫與設計紀錄。
 

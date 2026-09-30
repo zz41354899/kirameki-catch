@@ -130,6 +130,7 @@ function draw(time) {
   if (inspectMode) {
     canvas.value.dataset.motionScale = diagnostics.motionScale.toFixed(4)
     canvas.value.dataset.displacementGradient = diagnostics.maxDisplacementGradient.toFixed(4)
+    canvas.value.dataset.swayDegrees = (simulation.sway.rotation * 180 / Math.PI).toFixed(3)
   }
 }
 
@@ -198,7 +199,7 @@ onMounted(async () => {
     visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting !== false }, { rootMargin: '160px' })
     visibilityObserver.observe(canvas.value)
     ready.value = true
-    emit('ready', { runtime: 'momo-shared-surface-v4', meshes: 1, pins: pins.length + simulation.hair.pins.length + simulation.accessories.pins.length, hairZones: simulation.hair.chains.length })
+    emit('ready', { runtime: 'momo-shared-surface-v7', meshes: 1, pins: pins.length + simulation.hair.pins.length + simulation.accessories.pins.length, hairZones: simulation.hair.chains.length })
     frameId = window.requestAnimationFrame(render)
   } catch (error) {
     console.error('Momo shared surface failed to load', error)
@@ -218,7 +219,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="momo-rig-v2" :class="{ 'is-ready': ready }">
-    <canvas ref="canvas" class="momo-rig-v2__canvas" :style="canvasStyle" data-renderer="shared-surface-v4" :data-canvas-padding="MOMO_CANVAS_PADDING" :data-hair-zones="simulation.hair.chains.length" :data-hair-pins="simulation.hair.pins.length" :data-accessory-zones="simulation.accessories.pins.length" aria-hidden="true" />
+    <canvas ref="canvas" class="momo-rig-v2__canvas" :style="canvasStyle" data-renderer="shared-surface-v7" :data-canvas-padding="MOMO_CANVAS_PADDING" :data-hair-zones="simulation.hair.chains.length" :data-hair-pins="simulation.hair.pins.length" :data-accessory-zones="simulation.accessories.pins.length" aria-hidden="true" />
     <img class="momo-rig-v2__fallback" src="/images/momo-moon-rabbit-hero-v2.webp" :alt="alt" draggable="false" />
   </div>
 </template>

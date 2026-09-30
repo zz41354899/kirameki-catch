@@ -159,3 +159,34 @@ was active; returned to normal pointer mode and reset the viewport afterward.
 A CSS regression test covers base, ready and responsive wrapper selectors and
 rejects overflow clipping or paint containment. All 24 tests, production build
 and whitespace checks pass. Visual proof: unclipped-v6.png.
+
+## Natural idle sway (v7)
+
+Added a shared, aspect-correct whole-character transform: a 7.2-second primary
+sway with a slower secondary rhythm, gentle translation, and a 1.2-second
+ease-in. The same transform applies to every vertex after local deformation.
+Its direction feeds the existing hair and accessory springs for delayed follow-
+through. It does not replace pointer/touch parameters or alter texture pixels.
+Animation time advances by bounded rendered deltas to avoid suspension jumps.
+The shared fold guard and canvas padding remain active.
+
+840 idle frames produced 56.93 source pixels of head travel, minimum triangle
+area ratio 0.7706, no limiter activation, and no padded-canvas escape. The
+600-frame pointer reversal/stall test retained minimum area ratio 0.6299.
+26 tests, asset validation, production build and diff checks passed (build has
+the existing module-preload-polyfill sourcemap warning). Chrome showed changing
+sway angles with motionScale 1, no captured warning/error logs, and visible
+wrapper overflow at desktop and 390x844. Manual pointer reversals were checked;
+this is responsive desktop emulation, not physical-device touch validation.
+Screenshot: natural-sway-v7.png. Original artwork and local hair roots preserved.
+
+### Stronger idle amplitude (v8 preview)
+
+Kept the 7.2-second rhythm; increased rotation from .028 to .044 radians maximum,
+horizontal drift from .006 to .010, and vertical float from .003 to .009.
+Secondary spring drive increases moderately, without changing pin travel limits.
+The same 840-frame test now measures 91.14 source pixels of head travel (1.60x)
+and 27.65 pixels of vertical float. Idle minimum triangle area ratio is 0.7614;
+rapid reversals/stalls retain 0.6188. All sampled vertices remain in overscan.
+26 tests, production build and diff checks pass. Chrome preview shows motionScale
+1 and visible wrapper overflow. Screenshot: natural-sway-v8.png.
